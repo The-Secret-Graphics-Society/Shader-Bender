@@ -1,59 +1,62 @@
-// Copyright (c) 2023 homuler
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file or at
-// https://opensource.org/licenses/MIT.
-
 using System.Collections.Generic;
+using Mediapipe.Tasks.Components.Containers;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using UnityEngine;
 
 namespace Mediapipe.Unity
 {
-  public class PoseLandmarkerResultAnnotationController : AnnotationController<MultiPoseLandmarkListWithMaskAnnotation>
-  {
-    [SerializeField] private bool _visualizeZ = false;
-
-    private readonly object _currentTargetLock = new object();
-    private PoseLandmarkerResult _currentTarget;
-
-    public void InitScreen(int maskWidth, int maskHeight) => annotation.InitMask(maskWidth, maskHeight);
-
-    public void DrawNow(PoseLandmarkerResult target)
+    public class PoseLandmarkerResultAnnotationController : AnnotationController<MultiPoseLandmarkListWithMaskAnnotation>
     {
-      target.CloneTo(ref _currentTarget);
-      SyncNow();
-    }
+        public delegate void PoseLandmarksUpdated(List<Mediapipe.Tasks.Components.Containers.Landmark> landmarks);
+        public event PoseLandmarksUpdated OnPoseLandmarksUpdated;
+        [SerializeField] private bool _visualizeZ = false;
 
-    public void DrawLater(PoseLandmarkerResult target) => UpdateCurrentTarget(target);
+        private readonly object _currentTargetLock = new object();
+        private PoseLandmarkerResult _currentTarget;
 
-    private void ReadMask(IReadOnlyList<Image> segmentationMasks) => annotation.ReadMask(segmentationMasks, isMirrored);
+        public void InitScreen(int maskWidth, int maskHeight) => annotation.InitMask(maskWidth, maskHeight);
 
-    protected void UpdateCurrentTarget(PoseLandmarkerResult newTarget)
-    {
-      lock (_currentTargetLock)
-      {
-        newTarget.CloneTo(ref _currentTarget);
-        isStale = true;
-      }
-    }
-
-    protected override void SyncNow()
-    {
-      lock (_currentTargetLock)
-      {
-        isStale = false;
-        if (_currentTarget.segmentationMasks != null)
+        public void DrawNow(PoseLandmarkerResult target)
         {
-          ReadMask(_currentTarget.segmentationMasks);
-          // TODO: stop disposing masks here
-          foreach (var mask in _currentTarget.segmentationMasks)
-          {
-            mask.Dispose();
-          }
+            target.CloneTo(ref _currentTarget);
+            SyncNow();
         }
-        annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
-      }
+
+        public void DrawLater(PoseLandmarkerResult target) => UpdateCurrentTarget(target);
+
+        private void ReadMask(IReadOnlyList<Image> segmentationMasks) => annotation.ReadMask(segmentationMasks, isMirrored);
+
+        protected void UpdateCurrentTarget(PoseLandmarkerResult newTarget)
+        {
+            lock (_currentTargetLock)
+            {
+                newTarget.CloneTo(ref _currentTarget);
+                isStale = true;
+            }
+        }
+
+        protected override void SyncNow()
+        {
+            lock (_currentTargetLock)
+            {
+                isStale = false;
+                if (_currentTarget.segmentationMasks != null)
+                {
+                    ReadMask(_currentTarget.segmentationMasks);
+                    // TODO: stop disposing masks here
+                    foreach (var mask in _currentTarget.segmentationMasks)
+                    {
+                        mask.Dispose();
+                    }
+                }
+
+                if (_currentTarget.poseLandmarks != null && _currentTarget.poseLandmarks.Count > 0)
+                {
+                    //annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
+                    List<Landmarks> landmarks = _currentTarget.poseWorldLandmarks;
+                    OnPoseLandmarksUpdated?.Invoke(landmarks[0].landmarks);
+                }
+            }
+        }
     }
-  }
 }
