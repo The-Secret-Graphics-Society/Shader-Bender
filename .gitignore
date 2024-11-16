@@ -92,3 +92,6 @@ UpgradeLog.htm
 UpgradeLog2.htm
 
 .vscode
+
+# Too large MediaPipe files
+/Packages/com.github.homuler.mediapipe/Runtime/Plugins/iOS/MediaPipeUnity.framework/MediaPipeUnity
