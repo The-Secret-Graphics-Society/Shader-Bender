@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using Mediapipe.Tasks.Components.Containers;
 
 public class AvatarIKController : MonoBehaviour
 {
@@ -30,22 +28,22 @@ public class AvatarIKController : MonoBehaviour
         positionOffset = transform.position;
     }
 
-    public void UpdateAvatarPose(List<Landmark> landmarks)
+    public void UpdateAvatarPose(Vector3[] landmarks)
     {
-        if (landmarks == null || landmarks.Count == 0)
+        if (landmarks == null || landmarks.Length == 0)
             return;
 
         UpdateIKTargets(landmarks);
     }
 
-    private void UpdateIKTargets(List<Landmark> landmarks)
+    private void UpdateIKTargets(Vector3[] landmarks)
     {
         // Get landmark positions to calculate midpoints
         // We will get the spine as a vector which we can use for rotation.
-        Vector3 leftHip = GetVectorFromLandmark(landmarks[23]);
-        Vector3 rightHip = GetVectorFromLandmark(landmarks[24]);
-        Vector3 leftShoulder = GetVectorFromLandmark(landmarks[11]);
-        Vector3 rightShoulder = GetVectorFromLandmark(landmarks[12]);
+        Vector3 leftHip = ScaleLandmarkVector(landmarks[23]);
+        Vector3 rightHip = ScaleLandmarkVector(landmarks[24]);
+        Vector3 leftShoulder = ScaleLandmarkVector(landmarks[11]);
+        Vector3 rightShoulder = ScaleLandmarkVector(landmarks[12]);
         Vector3 shoulderMidpoint = (leftShoulder + rightShoulder) / 2.0f;
         Vector3 hipMidpoint = (leftHip + rightHip) / 2.0f;
         Vector3 bodyRight = (rightHip - leftHip).normalized;
@@ -59,30 +57,30 @@ public class AvatarIKController : MonoBehaviour
         transform.rotation = bodyRotation;
 
         // Update left hand target
-        Vector3 leftWrist = GetVectorFromLandmark(landmarks[15]) + positionOffset;
+        Vector3 leftWrist = ScaleLandmarkVector(landmarks[15]) + positionOffset;
         leftHandTarget.position = leftWrist;
 
         // Update right hand target
-        Vector3 rightWrist = GetVectorFromLandmark(landmarks[16]) + positionOffset;
+        Vector3 rightWrist = ScaleLandmarkVector(landmarks[16]) + positionOffset;
         rightHandTarget.position = rightWrist;
 
         // Update left foot target
-        Vector3 leftAnkle = GetVectorFromLandmark(landmarks[27]) + positionOffset;
+        Vector3 leftAnkle = ScaleLandmarkVector(landmarks[27]) + positionOffset;
         leftFootTarget.position = leftAnkle;
 
         // Update right foot target
-        Vector3 rightAnkle = GetVectorFromLandmark(landmarks[28]) + positionOffset;
+        Vector3 rightAnkle = ScaleLandmarkVector(landmarks[28]) + positionOffset;
         rightFootTarget.position = rightAnkle;
 
         // Update head target, not implemented
-        // Vector3 nose = GetVectorFromLandmark(landmarks[0]) + positionOffset;
+        // Vector3 nose = ScaleLandmarkVector(landmarks[0]) + positionOffset;
         // headTarget.position = nose;
     }
 
-    private Vector3 GetVectorFromLandmark(Landmark landmark)
+    private Vector3 ScaleLandmarkVector(Vector3 landmark)
     {
         float x = landmark.x * xScale;
-        float y = -landmark.y * yScale; 
+        float y = landmark.y * yScale; 
         float z = landmark.z * zScale;
 
         return new Vector3(x, y, z);
