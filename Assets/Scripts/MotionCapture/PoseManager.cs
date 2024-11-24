@@ -3,6 +3,9 @@ using UnityEngine;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity;
 using Mediapipe.Tasks.Components.Containers;
+using System.Linq;
+using System.Collections;
+using UnityEngine.EventSystems;
 
 public class PoseManager : MonoBehaviour
 {
@@ -28,6 +31,8 @@ public class PoseManager : MonoBehaviour
     private KalmanFilter[] landmarkFilters = new KalmanFilter[33];
     private Vector3[] landmarkPositions = new Vector3[33];
 
+    // Indices of the landmarks representing the legs and hips
+    private int[] legsToHips = {31,27,25,23,24,26,28,32};
 
     void Awake()
     {
@@ -63,6 +68,7 @@ public class PoseManager : MonoBehaviour
 
         // Subscribe to the landmarks updated event
         annotationController.OnPoseLandmarksUpdated += OnPoseLandmarksUpdated;
+        StartCoroutine(StartupCalibrateToPlayer());
     }
 
     void OnPoseLandmarksUpdated(List<Landmark> landmarks)
@@ -77,6 +83,30 @@ public class PoseManager : MonoBehaviour
 
             var landmark = landmarks[index];
             Vector3 worldPosition = new Vector3(landmark.x, -landmark.y, landmark.z);
+
+            // Offset based on calibration
+            if (poseScriptableObject.calibrated)
+            {
+                // Get the distance to floor based on the foot closest to the floor (cannot jump)
+                float leftFootDist = poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight;
+                float rightFoot = poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight;
+
+                if (Mathf.Abs(leftFootDist) < Mathf.Abs(rightFoot))
+                {
+                    worldPosition.y -= leftFootDist;
+                }
+                else
+                {
+                    worldPosition.y -= rightFoot;
+                }
+
+
+                float distanceToFloor = Mathf.Min(Mathf.Abs(poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight), 
+                                                      Mathf.Abs(poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight));
+                Debug.Log(distanceToFloor);
+
+                worldPosition.y -= distanceToFloor;
+            }
 
             // Apply Kalman filtering
             KalmanFilter filter = landmarkFilters[index];
@@ -108,15 +138,18 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.isLeftHandAboveShoulder = landmarkPositions[11].y < landmarkPositions[15].y;
         poseScriptableObject.isRightHandAboveShoulder = landmarkPositions[12].y < landmarkPositions[16].y;
 
-        // Foot grounded detection, not fully implemented
-        poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31]);
-        poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32]);
+        // Foot grounded detection
+        if (poseScriptableObject.calibrated)
+        {
+            poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31], poseScriptableObject.floorHeight);
+            poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32], poseScriptableObject.floorHeight);
+        }
 
         // Update hand and foot positions
         poseScriptableObject.UpdateLeftHandPosition(landmarkPositions[15]);
         poseScriptableObject.UpdateRightHandPosition(landmarkPositions[16]);
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
-        poseScriptableObject.leftFootPosition = landmarkPositions[32];
+        poseScriptableObject.rightFootPosition = landmarkPositions[32];
 
         // Update the avatar pose
         if (avatarIKController != null)
@@ -164,6 +197,33 @@ public class PoseManager : MonoBehaviour
     private bool isFootGrounded(Vector3 foot, float floorHeight = -0.46f) {
         return foot.y < floorHeight + 0.1f;
     }
+
+    private IEnumerator StartupCalibrateToPlayer()
+    {
+        Debug.Log("Calibrating to player...");
+        yield return new WaitForSeconds(5f);
+        Debug.Log("Calibrated to player!");
+
+        CalibrateToPlayer();
+    }
+
+    private void CalibrateToPlayer()
+    {
+        // Set the floor height to the lowest foot position
+        poseScriptableObject.floorHeight = Mathf.Min(poseScriptableObject.leftFootPosition.y, poseScriptableObject.rightFootPosition.y);
+
+        //poseScriptableObject.defaultHipPosition = (landmarkPositions[23] + landmarkPositions[24])/2f;
+
+        // Set the hips to shoulder distance to the distance between the hips and shoulders
+        poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24])/2f , (landmarkPositions[12]+ landmarkPositions[11])/2f);
+
+        // Set the screen space hips position to the hips position projected onto the screen
+        poseScriptableObject.screenspaceHipsPosition = Camera.main.WorldToScreenPoint(landmarkPositions[24]);
+
+        // Set the calibrated flag to true
+        poseScriptableObject.calibrated = true;
+    }
+
 
     void OnDestroy()
     {

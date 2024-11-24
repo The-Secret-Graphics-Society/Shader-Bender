@@ -16,8 +16,12 @@ MonoBehaviour:
   isRightFistClenched: 0
   isLeftHandAboveShoulder: 0
   isRightHandAboveShoulder: 0
-  leftFootPosition: {x: 0, y: 0, z: 0}
-  rightFootPosition: {x: 0, y: 0, z: 0}
-  isLeftFootGrounded: 0
+  leftFootPosition: {x: 0.10474106, y: -0.7786819, z: 0.23449051}
+  rightFootPosition: {x: -0.08670479, y: -0.6280563, z: 0.099219546}
+  isLeftFootGrounded: 1
   isRightFootGrounded: 0
+  calibrated: 1
+  floorHeight: -0.85746765
+  hipsToShoulder: 0.49573374
+  screenspaceHipsPosition: {x: 569.5418, y: 158.3992, z: 3.1325705}
   maxHandPositionHistory: 120
