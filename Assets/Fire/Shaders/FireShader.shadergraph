@@ -17,6 +17,9 @@
         },
         {
             "m_Id": "fa188cd696c543ed96e7b681209bc38b"
+        },
+        {
+            "m_Id": "45b649e3ec4047e992fe704af167dfeb"
         }
     ],
     "m_Keywords": [],
@@ -1231,6 +1234,36 @@
         "z": 0.0,
         "w": 0.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty",
+    "m_ObjectId": "45b649e3ec4047e992fe704af167dfeb",
+    "m_Guid": {
+        "m_GuidSerialized": "a9df38b8-c70f-4f13-bed4-f443acc8be33"
+    },
+    "m_Name": "FireTexture",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "FireTexture",
+    "m_DefaultReferenceName": "_FireTexture",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": {
+        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"45dbeeab154426c488593d492c94b446\",\"type\":3}}",
+        "m_Guid": ""
+    },
+    "isMainTexture": false,
+    "useTilingAndOffset": false,
+    "m_Modifiable": true,
+    "m_DefaultType": 0
 }
 
 {
@@ -2812,10 +2845,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -590.9999389648438,
-            "y": 18.99996566772461,
-            "width": 160.0,
-            "height": 34.000022888183597
+            "x": -620.0000610351563,
+            "y": -11.000014305114746,
+            "width": 160.00003051757813,
+            "height": 34.000038146972659
         }
     },
     "m_Slots": [
@@ -3324,6 +3357,9 @@
         },
         {
             "m_Id": "fa188cd696c543ed96e7b681209bc38b"
+        },
+        {
+            "m_Id": "45b649e3ec4047e992fe704af167dfeb"
         }
     ]
 }
