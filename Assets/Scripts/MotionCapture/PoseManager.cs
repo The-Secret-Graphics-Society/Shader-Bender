@@ -21,7 +21,7 @@ public class PoseManager : MonoBehaviour
     private float measurementNoise = 0.01f;
 
     // Indices of the pose landmarks to track
-    private int[] landmarkIndices = { 0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
+    private int[] landmarkIndices = { 0, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
 
     // Arrays to hold landmark cubes, Kalman filters, and updated positions
     private GameObject[] landmarkCubes = new GameObject[33];
@@ -51,8 +51,8 @@ public class PoseManager : MonoBehaviour
             KalmanFilter filter = new KalmanFilter(Vector3.zero, processNoise, measurementNoise);
             landmarkFilters[index] = filter;
 
-            // Disable rendering cubes representing hand landmarks or if we don't want to render them
-            if ((index >= 17 && index <= 22) || !renderCubes)
+            // Disable rendering cubes representing hand or ear landmarks or if we don't want to render them
+            if (index == 7 || index == 8 || (index >= 17 && index <= 22) || !renderCubes)
             {
                 if (cube.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
                 {
@@ -121,7 +121,7 @@ public class PoseManager : MonoBehaviour
         // Update the avatar pose
         if (avatarIKController != null)
         {
-            avatarIKController.UpdateAvatarPose(landmarkPositions);
+            if (avatarIKController.enabled) avatarIKController.UpdateAvatarPose(landmarkPositions);
         }
     }
 
