@@ -80,6 +80,14 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                 return 1 / (4 * M_PI) * (1 - g * g) / (denom * sqrt(denom));
             }
 
+            // Converts depth buffer values into world space depth using near and far plane values
+            float linearizeDepth(float depth)
+            {
+                float zNear = _ProjectionParams.y; // Near plane of the camera
+                float zFar = _ProjectionParams.z;  // Far plane of the camera
+                return zNear * zFar / (zFar + depth * (zNear - zFar));
+            }
+
             v2f vert (mesh_data v)
             {
                 v2f o;
@@ -92,6 +100,22 @@ Shader "David/Participating_Media/AoEWindAesthetic"
 
             float4 frag (v2f i) : SV_Target
             {
+                // Sample the depth texture
+                float depthBufferValue = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv).r;
+
+                // Linearize the depth to world space
+                float sceneDepth = linearizeDepth(depthBufferValue);
+
+                // Get the fragment's world space depth
+                float fragmentDepth = length(i.positionWS - _WorldSpaceCameraPos);
+
+                // Compare depths
+                if (fragmentDepth > sceneDepth)
+                {
+                    // Discard if the fragment is occluded
+                    discard;
+                }
+
                 //_Visibility = 1.0;
                 // 1. Define the color of the participating medium
                 float4 volumeColor      = float4(0.0, 0.0, 0.0, 0.0);
