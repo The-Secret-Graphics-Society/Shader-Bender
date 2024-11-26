@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MeteorSpawner : MonoBehaviour
 {
-    public GameObject vfx;
+    public GameObject meteorPrefab;
     [SerializeField] private PoseScriptableObject _poseScriptableObject;
     public Transform startPosition;
     public Transform endPosition;
@@ -41,7 +41,7 @@ public class MeteorSpawner : MonoBehaviour
     void MeteorShower()
     {
         var startPos = startPosition.position;
-        GameObject objVFX = Instantiate(vfx, startPos, Quaternion.identity) as GameObject;
+        GameObject objVFX = Instantiate(meteorPrefab, startPos, Quaternion.identity) as GameObject;
         var endPos = endPosition.position;
         Rotation(objVFX, endPos);
     }

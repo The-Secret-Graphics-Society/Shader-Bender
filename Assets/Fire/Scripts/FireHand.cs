@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FireHand : MonoBehaviour
 {
-    public ParticleSystem sfx;
+    public ParticleSystem fireParticles;
     [SerializeField] private PoseScriptableObject _poseScriptableObject;
     private bool rightHandRaised;
     private Vector3 handPosition;
@@ -39,7 +39,7 @@ public class FireHand : MonoBehaviour
         handPosition = _poseScriptableObject.GetCurrentLeftHandPosition();
         Debug.Log("Current Hand Position: " + handPosition);
 
-        Instantiate(sfx, handPosition, Quaternion.identity);
+        Instantiate(fireParticles, handPosition, Quaternion.identity);
     }
     */
 }
