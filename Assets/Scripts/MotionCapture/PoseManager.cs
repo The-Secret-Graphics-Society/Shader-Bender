@@ -118,6 +118,10 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
         poseScriptableObject.leftFootPosition = landmarkPositions[32];
 
+        // Update the rotations of the hands, not fully implemented, just using a vector from the elbow to the wrist
+        poseScriptableObject.leftHandRotation = Quaternion.LookRotation((landmarkPositions[15] - landmarkPositions[13]).normalized);
+        poseScriptableObject.rightHandRotation = Quaternion.LookRotation((landmarkPositions[16] - landmarkPositions[14]).normalized);
+
         // Update the avatar pose
         if (avatarIKController != null)
         {

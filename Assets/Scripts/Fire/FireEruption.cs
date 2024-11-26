@@ -48,7 +48,7 @@ public class FireEruption : MonoBehaviour
 
             // Emit the particle
             fireParticles.Emit(emitParams, 1);
-            Debug.Log($"Particle emitted at position: {emitParams.position}");
+            //Debug.Log($"Particle emitted at position: {emitParams.position}");
 
             // Calculate a random delay
             float randomDelay = Random.Range(0f, eruptDuration / particleCount);
