@@ -22,13 +22,13 @@ public class MeteorSpawner : MonoBehaviour
         if (_poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder)
         {
             rightHandRaised = true;
-            Debug.Log("right hand raised");
+            //Debug.Log("right hand raised");
         }
         if(!_poseScriptableObject.isLeftHandAboveShoulder && rightHandRaised)
             {
                 interaction = true;
                 rightHandRaised = false;
-                Debug.Log("right hand lowered");
+                //Debug.Log("right hand lowered");
             }
         // When the interaction criteria is met, we spawn in the fireEruption
         if (interaction)
