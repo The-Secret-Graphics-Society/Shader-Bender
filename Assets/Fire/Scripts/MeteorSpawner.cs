@@ -5,10 +5,12 @@ using UnityEngine;
 public class MeteorSpawner : MonoBehaviour
 {
     public GameObject vfx;
+    [SerializeField] private PoseScriptableObject _poseScriptableObject;
     public Transform startPosition;
     public Transform endPosition;
     private bool interaction;
-    public int meteorCount = 1;
+    private bool rightHandRaised;
+    //public int meteorCount = 1;
 
     void Start()
     {
@@ -17,10 +19,17 @@ public class MeteorSpawner : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("r"))
+        if (_poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder)
         {
-            interaction = true;
+            rightHandRaised = true;
+            Debug.Log("right hand raised");
         }
+        if(!_poseScriptableObject.isLeftHandAboveShoulder && rightHandRaised)
+            {
+                interaction = true;
+                rightHandRaised = false;
+                Debug.Log("right hand lowered");
+            }
         // When the interaction criteria is met, we spawn in the fireEruption
         if (interaction)
         {

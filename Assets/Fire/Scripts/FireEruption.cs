@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FireEruption : MonoBehaviour
 {
+    [SerializeField] private PoseScriptableObject _poseScriptableObject;
     public ParticleSystem fireParticles;
-    private ParticleSystem system;
     public float rad = 3f;
     public float innerRad = 1f;
     public int particleCount = 1;
@@ -21,7 +21,7 @@ public class FireEruption : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("e"))
+        if (_poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder)
         {
             interaction = true;
         }
@@ -29,14 +29,12 @@ public class FireEruption : MonoBehaviour
         if (interaction)
         {
             StartCoroutine(EruptinTorusShape());
-            Debug.Log("Started coroutine: EruptinTorusShape");
             interaction = false;
         }
     }
 
     private IEnumerator EruptinTorusShape()
     {
-        Debug.Log("Started Coroutine");
         for (int i = 0; i < particleCount; i++)
         {
             // Any parameters we assign in emitParams will override the current particle systems when we call Emit.
