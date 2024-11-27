@@ -27,6 +27,11 @@ public class PoseScriptableObject : ScriptableObject
     [SerializeField, Tooltip("Maximum size for hand position LinkedLists")]
     private float maxHandPositionHistory = 120;
 
+    // Calibration Stats
+    public float floorHeight = 0.0f;
+    public bool isCalibrated = false;
+    public bool calibrating = false;
+
     public void Initialise()
     {
         leftHandPositions.Clear();
@@ -39,6 +44,9 @@ public class PoseScriptableObject : ScriptableObject
         rightFootPosition = Vector3.zero;
         
         isLeftFootGrounded = isRightFootGrounded = false;
+
+        isCalibrated = false;
+        calibrating = false;
     }
 
     public Vector3 GetCurrentLeftHandPosition()
