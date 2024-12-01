@@ -6,12 +6,15 @@ using UnityEngine;
 public class LightningEffect : ScriptableObject
 {
     // The colours at the start and end of a lightning bolt
-    [SerializeField] Color _sourceColour = Color.red;
-    [SerializeField] Color _targetColour = Color.blue;
+    public Color _sourceColor = Color.red;
+    public Color _targetColor = Color.blue;
 
     // Determines how far the first bezier control point is from the source
-    [SerializeField] float _bezierCurveDistance = 1f;
+    public float _bezierCurveDistance = 1f;
     
     // The distance from curve that lighting vertices will be offset
-    [SerializeField] float _lightningJitterOffset = 1f;
+    public float _lightningJitterOffset = 1f;
+
+    public float _animationTime = 0.2f;
+    public bool animating = true;
 }

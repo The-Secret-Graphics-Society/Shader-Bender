@@ -14,7 +14,7 @@ public class LightningEffectController : MonoBehaviour
     // lightning mesh
     private Mesh mesh;
 
-    private const int VertexCount = 128;
+    private const int VertexCount = 64;
 
     void Start()
     {
@@ -32,7 +32,7 @@ public class LightningEffectController : MonoBehaviour
         for (int i = 0; i < VertexCount; i++)
         {
             float t = (float)i / (VertexCount - 1); // Normalize between 0 and 1
-            vertices[i] = Vector3.Lerp(LightningSource.position, LightningTarget.position, t);
+            vertices[i] = Vector3.Lerp(LightningSource.position, LightningTarget.position, t)*2f;
         }
 
         // Generate edges (indices)
@@ -51,6 +51,10 @@ public class LightningEffectController : MonoBehaviour
 
         // Set the material
         GetComponent<MeshRenderer>().material = material;
+
+        material.SetInteger("_VertexCount", VertexCount);
+
+        StartCoroutine(AnimateLightning());
     }
 
     void Update()
@@ -60,19 +64,19 @@ public class LightningEffectController : MonoBehaviour
 
     private void UpdateLightningVertices()
     {
-        //// Dynamically update vertices if source or target moves
-        //Vector3[] vertices = mesh.vertices;
-        //for (int i = 0; i < VertexCount; i++)
-        //{
-        //    float t = (float)i / (VertexCount - 1); // Normalize between 0 and 1
-        //    vertices[i] = Vector3.Lerp(LightningSource.position, LightningTarget.position, t);
-        //}
-
-        //mesh.vertices = vertices;
-        //mesh.RecalculateBounds();
-
         // Pass the source and target to the shader
+        material.SetColor("_SourceColor", _lightningScriptableObject._sourceColor);
+        material.SetColor("_TargetColor", _lightningScriptableObject._targetColor);
         material.SetVector("_SourcePoint", LightningSource.position);
         material.SetVector("_TargetPoint", LightningTarget.position);
+    }
+
+    IEnumerator AnimateLightning()
+    {
+        while (_lightningScriptableObject.animating)
+        {
+            yield return new WaitForSeconds(_lightningScriptableObject._animationTime);
+            material.SetFloat("_RandSeed", Random.Range(0f, _lightningScriptableObject._lightningJitterOffset));
+        }
     }
 }

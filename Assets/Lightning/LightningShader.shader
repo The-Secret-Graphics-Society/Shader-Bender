@@ -7,6 +7,9 @@ Shader "Custom/LightningShader"
         _Width("Width", Float) = 0.1
         _SourcePoint("Source Point", Vector) = (0, 0, 0, 1)
         _TargetPoint("Target Point", Vector) = (0, 0, 0, 1)
+        _OffsetScale("Offset Scale", Float) = 0.3
+        _RandSeed("Jitter Randomness Seed", Float) = 0
+        _VertexCount("Vertex Count", Integer) = 0
     }
 
     SubShader
@@ -15,6 +18,8 @@ Shader "Custom/LightningShader"
         Blend SrcAlpha OneMinusSrcAlpha
         Pass
         {
+            ZWrite On
+
             CGPROGRAM
             #pragma target 4.6
             #pragma vertex vert
@@ -69,17 +74,71 @@ Shader "Custom/LightningShader"
             float4 _TargetPoint;
             float4 _SourceColor;
             float4 _TargetColor;
+            float _OffsetScale;
+            float _RandSeed;
             float _Width;
+            int _VertexCount;
+
+            float Random(int seed)
+            {
+                // Use a large prime number and sine to generate randomness
+                float random = frac(sin(seed * 12.9898) * 43758.5453123 * _RandSeed);
+                return random;
+            }
 
             // Vertex Shader
             v2g vert(appdata_t v)
             {
                 v2g o;
-                float4 worldPosition = (v.vertexIndex == 0) ? _SourcePoint : _TargetPoint;
+
+                // Interpolation factor
+                float t = (float)v.vertexIndex / (float)_VertexCount;
+
+                // Interpolated world position
+                float4 worldPosition = lerp(_SourcePoint, _TargetPoint, t);
+
+                // Direction vector from source to target
+                float3 sourceToTargetVector = normalize(_TargetPoint.xyz - _SourcePoint.xyz);
+
+                // Generate a random angle in degrees
+                float randAngle = Random(v.vertexIndex) * 360.0;
+
+                // Create a perpendicular direction vector
+                float3 up = float3(0, 1, 0);
+                if (abs(dot(up, sourceToTargetVector)) > 0.99) // Handle degenerate case
+                    up = float3(1, 0, 0);
+                float3 perpendicularVector = normalize(cross(sourceToTargetVector, up));
+
+                // Rotate the perpendicular vector by a random angle
+                float3 offsetDirection = normalize(
+                    cos(radians(randAngle)) * perpendicularVector +
+                    sin(radians(randAngle)) * cross(sourceToTargetVector, perpendicularVector)
+                );
+
+                // Ensure offset direction is not perpendicular to the camera view
+                float3 cameraViewDirection = normalize(_WorldSpaceCameraPos.xyz - worldPosition.xyz);
+                float alignment = dot(offsetDirection, cameraViewDirection);
+
+                // Adjust offset direction if alignment is close to zero
+                if (abs(alignment) < 0.1) // Threshold for near-perpendicularity
+                {
+                    offsetDirection = normalize(offsetDirection + cameraViewDirection * 0.5);
+                }
+
+                // Apply a random magnitude to the offset
+                float offsetMagnitude = Random(v.vertexIndex + 42) * _OffsetScale * _RandSeed;
+                float3 offset = offsetDirection * offsetMagnitude;
+
+                // Add the offset to the world position
+                worldPosition.xyz += offset;
+
+                // Transform to clip space
                 o.pos = UnityObjectToClipPos(worldPosition);
                 o.worldPos = worldPosition.xyz;
+
                 return o;
             }
+
 
             // // TESSELATION
 
@@ -136,11 +195,13 @@ Shader "Custom/LightningShader"
 
                 float3 offset = billboardDir * _Width * 0.5;
 
+                float overShoot = 0.01;
+
                 float3 vertices[4] = {
-                    input[0].worldPos - offset,
-                    input[0].worldPos + offset,
-                    input[1].worldPos - offset,
-                    input[1].worldPos + offset
+                    input[0].worldPos - offset - edgeDir * overShoot,
+                    input[0].worldPos + offset - edgeDir * overShoot,
+                    input[1].worldPos - offset + edgeDir * overShoot,
+                    input[1].worldPos + offset + edgeDir * overShoot
                 };
 
                 float2 uvs[4] = {
@@ -183,12 +244,39 @@ Shader "Custom/LightningShader"
                 o.uv = uvs[3];
                 o.pos = UnityWorldToClipPos(float4(o.worldPos, 1.0));
                 stream.Append(o);
+
+                stream.RestartStrip();
             }
 
             // Fragment Shader
+            // Fragment Shader
             fixed4 frag(g2f i) : SV_Target
             {
-                return lerp(_SourceColor, _TargetColor, i.uv.x);
+                // Interpolate color based on uv.x
+                fixed4 col = lerp(_SourceColor, _TargetColor, i.uv.x);
+
+                // Calculate distance from center
+                float distanceFromCenter = abs(i.uv.y - 0.5);
+
+                // Falloff for opacity
+                float falloff = 1.0 - (distanceFromCenter * 4.0);
+                falloff = saturate(falloff); // Clamp to [0, 1]
+
+                // Enhance brightness near center
+                float brightnessBoost = 1.0 - smoothstep(0.0, 0.1, distanceFromCenter); // Smooth near center
+                col.rgb = lerp(col.rgb, float3(1.0, 1.0, 1.0), brightnessBoost);
+
+                // falloff radially towards the ends of the uv.space
+                float distanceFromCenterX = abs(i.uv.x - 0.5);
+                falloff -= smoothstep(0.5, 1, distanceFromCenterX);
+
+                // Apply falloff to alpha
+                col.a *= falloff;
+
+                // Alpha clipping
+                clip(col.a < 0.2 ? -1:1);
+
+                return col;
             }
             ENDCG
         }

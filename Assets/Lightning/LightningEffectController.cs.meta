@@ -3,7 +3,13 @@ guid: e2b992895931624478ed06a494b73152
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - LightningSource: {instanceID: 0}
+  - LightningTarget: {instanceID: 0}
+  - LightningShader: {instanceID: 0}
+  - _lightningScriptableObject: {fileID: 11400000, guid: c4762e816a9e0ec418d41f4ecac5cda0,
+      type: 2}
+  - material: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
