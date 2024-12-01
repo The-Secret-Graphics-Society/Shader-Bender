@@ -8,9 +8,13 @@ public class LightningEffectController : MonoBehaviour
     [SerializeField] private Transform LightningTarget;
 
     [SerializeField] private Shader LightningShader;
+    [SerializeField] private LightningEffect _lightningScriptableObject;
     public Material material; // The material using the shader
 
+    // lightning mesh
     private Mesh mesh;
+
+    private const int VertexCount = 128;
 
     void Start()
     {
@@ -20,19 +24,24 @@ public class LightningEffectController : MonoBehaviour
             return;
         }
 
-        // Create a simple mesh with two vertices and one edge
+        // Create the mesh with 128 vertices and 127 edges
         mesh = new Mesh();
 
-        Vector3[] vertices = new Vector3[2]
+        // Generate vertices along the line between source and target
+        Vector3[] vertices = new Vector3[VertexCount];
+        for (int i = 0; i < VertexCount; i++)
         {
-            LightningSource.position,
-            LightningTarget.position
-        };
+            float t = (float)i / (VertexCount - 1); // Normalize between 0 and 1
+            vertices[i] = Vector3.Lerp(LightningSource.position, LightningTarget.position, t);
+        }
 
-        int[] indices = new int[2]
+        // Generate edges (indices)
+        int[] indices = new int[(VertexCount - 1) * 2];
+        for (int i = 0; i < VertexCount - 1; i++)
         {
-            0, 1 // Edge connecting the two vertices
-        };
+            indices[i * 2] = i;
+            indices[i * 2 + 1] = i + 1;
+        }
 
         mesh.vertices = vertices;
         mesh.SetIndices(indices, MeshTopology.Lines, 0);
@@ -51,13 +60,19 @@ public class LightningEffectController : MonoBehaviour
 
     private void UpdateLightningVertices()
     {
-        // Update the mesh if the source or target points change
-        mesh.vertices = new Vector3[2] { LightningSource.position, LightningTarget.position };
-        mesh.RecalculateBounds();
+        //// Dynamically update vertices if source or target moves
+        //Vector3[] vertices = mesh.vertices;
+        //for (int i = 0; i < VertexCount; i++)
+        //{
+        //    float t = (float)i / (VertexCount - 1); // Normalize between 0 and 1
+        //    vertices[i] = Vector3.Lerp(LightningSource.position, LightningTarget.position, t);
+        //}
+
+        //mesh.vertices = vertices;
+        //mesh.RecalculateBounds();
 
         // Pass the source and target to the shader
         material.SetVector("_SourcePoint", LightningSource.position);
         material.SetVector("_TargetPoint", LightningTarget.position);
     }
-
 }
