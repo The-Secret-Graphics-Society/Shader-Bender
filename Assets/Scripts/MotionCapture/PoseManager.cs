@@ -5,6 +5,9 @@ using Mediapipe.Unity;
 using Mediapipe.Tasks.Components.Containers;
 using System.Collections;
 using UnityEditor;
+using System.Net.NetworkInformation;
+using System;
+using UnityEngine.ProBuilder.Shapes;
 
 [CustomEditor(typeof(PoseManager))] 
 public class PoseManager : MonoBehaviour
@@ -31,8 +34,11 @@ public class PoseManager : MonoBehaviour
     private KalmanFilter[] landmarkFilters = new KalmanFilter[33];
     private Vector3[] landmarkPositions = new Vector3[33];
 
-    // Indices of the landmarks representing the legs and hips
-    private int[] legsToHips = {31,27,25,23,24,26,28,32};
+    float fistThreshold;
+    float pointThreshold;
+    float pinkyThreshold;
+    float thumbThreshold;
+
 
     void Awake()
     {
@@ -73,7 +79,7 @@ public class PoseManager : MonoBehaviour
         annotationController.OnPoseLandmarksUpdated += OnPoseLandmarksUpdated;
 
         // Start the calibration process
-        StartCoroutine(StartupCalibrateToPlayer(10));
+        StartCoroutine(StartupCalibrateToPlayer(5));
     }
 
     void OnPoseLandmarksUpdated(List<Landmark> landmarks)
@@ -130,12 +136,12 @@ public class PoseManager : MonoBehaviour
         GameObject leftHand = landmarkCubes[15];
         if (leftHand != null)
         {
-            poseScriptableObject.isLeftFistClenched = DetectFist(leftHand, landmarkPositions[15], landmarkPositions[17], landmarkPositions[19], landmarkPositions[21]);
+            poseScriptableObject.isLeftFistClenched = DetectFist(leftHand, landmarkPositions[15], landmarkPositions[17], landmarkPositions[19], landmarkPositions[21], true);
         }
         GameObject rightHand = landmarkCubes[16];
         if (rightHand != null)
         {
-            poseScriptableObject.isRightFistClenched = DetectFist(rightHand, landmarkPositions[16], landmarkPositions[18], landmarkPositions[20], landmarkPositions[22]);
+            poseScriptableObject.isRightFistClenched = DetectFist(rightHand, landmarkPositions[16], landmarkPositions[18], landmarkPositions[20], landmarkPositions[22], false);
         }
 
         // Hand above shoulder detection, not fully implemented?
@@ -166,24 +172,80 @@ public class PoseManager : MonoBehaviour
         }
     }
 
-    private bool DetectFist(GameObject wristCube, Vector3 wrist, Vector3 pinky, Vector3 index, Vector3 thumb)
+    private bool DetectFist(GameObject wristCube, Vector3 wrist, Vector3 pinky, Vector3 index, Vector3 thumb, bool left)
     {
         // Calculate distances between wrist and finger landmarks
         float pinkyDistance = Vector3.Distance(wrist, pinky);
         float indexDistance = Vector3.Distance(wrist, index);
         float thumbDistance = Vector3.Distance(wrist, thumb);
 
+        // print distances
+        Debug.Log("Pinky distance: " + pinkyDistance);
+        Debug.Log("Index distance: " + indexDistance);
+        Debug.Log("Thumb distance: " + thumbDistance);
+
         // Calculate a dynamic threshold based on hand size (distance between wrist and middle of fingers)
         // float fistThreshold = (pinkyDistance + indexDistance + thumbDistance) / 3.0f * handSizeFactor;
         // This should be done at calibration, with the size of the open fist used
-        float fistThreshold = handSizeFactor;
+
+        // if not calibrated
+        if (!poseScriptableObject.isCalibrated)
+        {
+            fistThreshold = handSizeFactor;
+        }
+        if (left)
+        {
+            poseScriptableObject.isLeftPinkyExtended = false;
+            poseScriptableObject.isLeftIndexExtended = false;
+            poseScriptableObject.isLeftThumbExtended = false;
+        }
+        else
+        {
+            poseScriptableObject.isRightPinkyExtended = false;
+            poseScriptableObject.isRightIndexExtended = false;
+            poseScriptableObject.isRightThumbExtended = false;
+        }
 
         // Check if each finger is curled in (distance below threshold) and
         // decide if it's a fist based on the number of curled fingers
         int curledFingers = 0;
-        if (pinkyDistance < fistThreshold) curledFingers++;
-        if (indexDistance < fistThreshold) curledFingers++;
-        if (thumbDistance < fistThreshold) curledFingers++;
+        if (pinkyDistance < pinkyThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftPinkyExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isRightPinkyExtended = true;
+            }
+            curledFingers++;
+        }
+        if (indexDistance < pointThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftIndexExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isLeftIndexExtended = true;
+            }
+            curledFingers++;
+        }
+        if (thumbDistance < thumbThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftThumbExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isRightThumbExtended = true;
+            }
+            poseScriptableObject.isLeftThumbExtended = true;
+            curledFingers++;
+        }
         bool isFist = curledFingers >= 2;
 
         if (wristCube.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
@@ -241,6 +303,26 @@ public class PoseManager : MonoBehaviour
 
         // set distance between palm and thumb (HandSizeFactor)
         //poseScriptableObject.palmToThumb = Vector3.Distance(landmarkPositions[15], landmarkPositions[20]);
+        // Calculate distances between wrist and finger landmarks
+        float pinkyDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[17]);
+        float indexDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[19]);
+        float thumbDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[21]);
+
+        float pinkyDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[18]);
+        float indexDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[20]);
+        float thumbDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[22]);
+
+        // Calculate a dynamic threshold based on hand size (distance between wrist and middle of fingers) from both hands
+        //fistThreshold = (pinkyDistanceL + pinkyDistanceR + indexDistanceL + indexDistanceR + thumbDistanceL + thumbDistanceR)/ 6.0f * handSizeFactor;
+
+        pointThreshold = (indexDistanceL + indexDistanceR) / 2.0f * 0.6f;
+        pinkyThreshold = (pinkyDistanceL + pinkyDistanceR) / 2.0f * 0.6f;
+        thumbThreshold = (thumbDistanceL + thumbDistanceR) / 2.0f * 0.6f;
+
+        //print point, pinky and thumb thresholds
+        Debug.Log("Point threshold: " + pointThreshold);
+        Debug.Log("Pinky threshold: " + pinkyThreshold);
+        Debug.Log("Thumb threshold: " + thumbThreshold);
 
         // Set the calibrated flag to true
         poseScriptableObject.calibrating = false;

@@ -16,6 +16,15 @@ public class PoseScriptableObject : ScriptableObject
     public bool isLeftHandAboveShoulder;
     public bool isRightHandAboveShoulder;
 
+    // Finger states
+    public bool isLeftIndexExtended;
+    public bool isRightIndexExtended;
+    public bool isLeftThumbExtended;
+    public bool isRightThumbExtended;
+    public bool isLeftPinkyExtended;
+    public bool isRightPinkyExtended;
+
+
     // Foot positions
     public Vector3 leftFootPosition;
     public Vector3 rightFootPosition;
@@ -51,6 +60,10 @@ public class PoseScriptableObject : ScriptableObject
         rightFootPosition = Vector3.zero;
         
         isLeftFootGrounded = isRightFootGrounded = false;
+
+        isLeftIndexExtended = isRightIndexExtended = false;
+        isLeftThumbExtended = isRightThumbExtended = false;
+        isLeftPinkyExtended = isRightPinkyExtended = false;
 
         isCalibrated = false;
         calibrating = false;
