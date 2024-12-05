@@ -104,7 +104,7 @@ Material:
     - _OffsetScale: 0.3
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RandSeed: 0.016852498
+    - _RandSeed: 0.28295726
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

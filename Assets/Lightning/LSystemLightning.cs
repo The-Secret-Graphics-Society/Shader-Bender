@@ -18,6 +18,14 @@ public class LSystemLightning : MonoBehaviour
     [SerializeField] float _jitterDist = 0.1f;
     [SerializeField] Material material;
 
+    [SerializeField] private Transform startPoint;
+    [SerializeField] private Transform endPoint;
+    [SerializeField] private float animationTime;
+    [SerializeField] private float animCycleOffset;
+    [SerializeField] private float bezierControlPointDist;
+    [SerializeField] private bool debug = false;
+
+
     private List<LineSegment> _lineSegmentList = new List<LineSegment>();
     private List<LineSegment> _newlineSegmentList = new List<LineSegment>();
 
@@ -29,21 +37,48 @@ public class LSystemLightning : MonoBehaviour
 
     IEnumerator AnimateLightning()
     {
+        yield return new WaitForSeconds(animCycleOffset);
         while (true)
         {
-            BuildLightningMesh(_iterations);
-            yield return new WaitForSeconds(1);
+            if (startPoint != null && endPoint != null)
+            {
+                BuildLightningMesh(_iterations, startPoint.position, endPoint.position);
+            }
+            yield return new WaitForSeconds(animationTime);
         }
     }
 
-    private void BuildLightningMesh(int _iterations)
+    private void BuildLightningMesh(int _iterations, Vector3 sp, Vector3 ep)
     {
         // Start with a single line segment
         LineSegment initialLineSegment = new LineSegment();
-        initialLineSegment.start = Vector3.zero;
-        initialLineSegment.end = Vector3.up * 25;
+        LineSegment initialLineSegment2 = new LineSegment();
+        LineSegment initialLineSegment3 = new LineSegment();
+
+        Vector3 midpoint = sp + startPoint.forward * bezierControlPointDist;
+        Vector3 midpoint1 = (midpoint + sp)/2f;
+        Vector3 midpoint2 = (midpoint + ep)/2f;
+
+        initialLineSegment.start = sp;
+        initialLineSegment.end = midpoint1;
+        initialLineSegment2.start = midpoint1;
+        initialLineSegment2.end = midpoint2;
+        initialLineSegment3.start = midpoint2;
+        initialLineSegment3.end = ep;
+
         initialLineSegment.upNormal = Vector3.Normalize(initialLineSegment.end - initialLineSegment.start);
+        initialLineSegment2.upNormal = Vector3.Normalize(initialLineSegment2.end - initialLineSegment2.start);
+        initialLineSegment3.upNormal = Vector3.Normalize(initialLineSegment3.end - initialLineSegment3.start);
         _lineSegmentList.Add(initialLineSegment);
+        _lineSegmentList.Add(initialLineSegment2);
+        _lineSegmentList.Add(initialLineSegment3);
+
+        if (debug)
+        {
+            Debug.DrawLine(initialLineSegment.start, initialLineSegment.end, Color.red, 1f);
+            Debug.DrawLine(initialLineSegment2.start, initialLineSegment2.end, Color.red, 1f);
+            Debug.DrawLine(initialLineSegment3.start, initialLineSegment3.end, Color.red, 1f);
+        }
 
         for (int i = 0; i < _iterations; i++)
         {
@@ -69,8 +104,9 @@ public class LSystemLightning : MonoBehaviour
         for (int i = 0; i < _lineSegmentList.Count; i++)
         {
             LineSegment linesegment = _lineSegmentList[i];
-            Debug.DrawLine(linesegment.start, linesegment.end, Random.ColorHSV(), 1f);
 
+            if (debug) Debug.DrawLine(linesegment.start, linesegment.end, Random.ColorHSV(), 1f);
+           
             vertices.Add(linesegment.start);
             vertices.Add(linesegment.end);
             int startIndex = vertices.Count - 2;
