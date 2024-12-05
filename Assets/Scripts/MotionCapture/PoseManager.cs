@@ -338,33 +338,6 @@ public class PoseManager : MonoBehaviour
         }
     }
 
-    private IEnumerator StartupCalibrateToPlayer()
-    {
-        Debug.Log("Calibrating to player...");
-        yield return new WaitForSeconds(5f);
-        Debug.Log("Calibrated to player!");
-
-        CalibrateToPlayer();
-    }
-
-    private void CalibrateToPlayer()
-    {
-        // Set the floor height to the lowest foot position
-        poseScriptableObject.floorHeight = Mathf.Min(poseScriptableObject.leftFootPosition.y, poseScriptableObject.rightFootPosition.y);
-
-        //poseScriptableObject.defaultHipPosition = (landmarkPositions[23] + landmarkPositions[24])/2f;
-
-        // Set the hips to shoulder distance to the distance between the hips and shoulders
-        poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24])/2f , (landmarkPositions[12]+ landmarkPositions[11])/2f);
-
-        // Set the screen space hips position to the hips position projected onto the screen
-        poseScriptableObject.screenspaceHipsPosition = Camera.main.WorldToScreenPoint(landmarkPositions[24]);
-
-        // Set the calibrated flag to true
-        poseScriptableObject.calibrated = true;
-    }
-
-
     void OnDestroy()
     {
         // Unsubscribe from the event

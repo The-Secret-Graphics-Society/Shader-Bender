@@ -44,7 +44,6 @@ public class PoseScriptableObject : ScriptableObject
     private float maxHandPositionHistory = 120;
 
     // Calibration Stats
-    public float floorHeight = 0.0f;
     public bool isCalibrated = false;
     public bool calibrating = false;
 
