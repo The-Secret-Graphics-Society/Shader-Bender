@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6763464b4f752834e8f924206de2eb31, type: 3}
   m_Name: PoseScriptableObject
   m_EditorClassIdentifier: 
+  leftHandRotation: {x: 0.04780889, y: 0.846621, z: -0.5243944, w: 0.07718619}
+  rightHandRotation: {x: 0.03424549, y: 0.82594055, z: -0.5604484, w: 0.050468054}
   isLeftFistClenched: 0
   isRightFistClenched: 0
   isLeftHandAboveShoulder: 0
   isRightHandAboveShoulder: 0
-  leftFootPosition: {x: 0.10474106, y: -0.7786819, z: 0.23449051}
-  rightFootPosition: {x: -0.08670479, y: -0.6280563, z: 0.099219546}
+  leftFootPosition: {x: -0.17625394, y: -0.82604325, z: 0.024823928}
+  rightFootPosition: {x: 0, y: 0, z: 0}
   isLeftFootGrounded: 1
-  isRightFootGrounded: 0
-  calibrated: 1
-  floorHeight: -0.85746765
-  hipsToShoulder: 0.49573374
-  screenspaceHipsPosition: {x: 569.5418, y: 158.3992, z: 3.1325705}
+  isRightFootGrounded: 1
   maxHandPositionHistory: 120
+  floorHeight: -0.82673705
+  isCalibrated: 1
