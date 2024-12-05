@@ -31,6 +31,8 @@ public class PoseManager : MonoBehaviour
     private KalmanFilter[] landmarkFilters = new KalmanFilter[33];
     private Vector3[] landmarkPositions = new Vector3[33];
 
+    // Indices of the landmarks representing the legs and hips
+    private int[] legsToHips = {31,27,25,23,24,26,28,32};
 
     void Awake()
     {
@@ -88,6 +90,7 @@ public class PoseManager : MonoBehaviour
             Vector3 worldPosition = new Vector3(landmark.x, -landmark.y, landmark.z);
 
             // Offset based on calibration
+
             if (poseScriptableObject.isCalibrated)
             {
                 // Get the distance to floor based on the foot closest to the floor (cannot jump)
@@ -139,15 +142,18 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.isLeftHandAboveShoulder = landmarkPositions[11].y < landmarkPositions[15].y;
         poseScriptableObject.isRightHandAboveShoulder = landmarkPositions[12].y < landmarkPositions[16].y;
 
-        // Foot grounded detection, not fully implemented
-        poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31]);
-        poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32]);
+        // Foot grounded detection
+        if (poseScriptableObject.calibrated)
+        {
+            poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31], poseScriptableObject.floorHeight);
+            poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32], poseScriptableObject.floorHeight);
+        }
 
         // Update hand and foot positions
         poseScriptableObject.UpdateLeftHandPosition(landmarkPositions[15]);
         poseScriptableObject.UpdateRightHandPosition(landmarkPositions[16]);
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
-        poseScriptableObject.leftFootPosition = landmarkPositions[32];
+        poseScriptableObject.rightFootPosition = landmarkPositions[32];
 
         // Update the rotations of the hands, not fully implemented, just using a vector from the elbow to the wrist
         poseScriptableObject.leftHandRotation = Quaternion.LookRotation((landmarkPositions[15] - landmarkPositions[13]).normalized);
@@ -249,6 +255,33 @@ public class PoseManager : MonoBehaviour
             StartCoroutine(StartupCalibrateToPlayer());
         }
     }
+
+    private IEnumerator StartupCalibrateToPlayer()
+    {
+        Debug.Log("Calibrating to player...");
+        yield return new WaitForSeconds(5f);
+        Debug.Log("Calibrated to player!");
+
+        CalibrateToPlayer();
+    }
+
+    private void CalibrateToPlayer()
+    {
+        // Set the floor height to the lowest foot position
+        poseScriptableObject.floorHeight = Mathf.Min(poseScriptableObject.leftFootPosition.y, poseScriptableObject.rightFootPosition.y);
+
+        //poseScriptableObject.defaultHipPosition = (landmarkPositions[23] + landmarkPositions[24])/2f;
+
+        // Set the hips to shoulder distance to the distance between the hips and shoulders
+        poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24])/2f , (landmarkPositions[12]+ landmarkPositions[11])/2f);
+
+        // Set the screen space hips position to the hips position projected onto the screen
+        poseScriptableObject.screenspaceHipsPosition = Camera.main.WorldToScreenPoint(landmarkPositions[24]);
+
+        // Set the calibrated flag to true
+        poseScriptableObject.calibrated = true;
+    }
+
 
     void OnDestroy()
     {
