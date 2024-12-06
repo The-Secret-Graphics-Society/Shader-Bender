@@ -24,6 +24,7 @@ public class LSystemLightning : MonoBehaviour
     [SerializeField] private float animCycleOffset;
     [SerializeField] private float bezierControlPointDist;
     [SerializeField] private bool debug = false;
+    public bool animating = false;
 
 
     private List<LineSegment> _lineSegmentList = new List<LineSegment>();
@@ -40,9 +41,17 @@ public class LSystemLightning : MonoBehaviour
         yield return new WaitForSeconds(animCycleOffset);
         while (true)
         {
-            if (startPoint != null && endPoint != null)
+            if (startPoint != null && endPoint != null && animating)
             {
                 BuildLightningMesh(_iterations, startPoint.position, endPoint.position);
+            }
+            else if (!animating)
+            {
+                MeshFilter meshFilter = GetComponent<MeshFilter>();
+                if (meshFilter != null)
+                {
+                    meshFilter.mesh = null;
+                }
             }
             yield return new WaitForSeconds(animationTime);
         }

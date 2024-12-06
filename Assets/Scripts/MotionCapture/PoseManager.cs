@@ -148,6 +148,13 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.isLeftHandAboveShoulder = landmarkPositions[11].y < landmarkPositions[15].y;
         poseScriptableObject.isRightHandAboveShoulder = landmarkPositions[12].y < landmarkPositions[16].y;
 
+        // check for close hands
+        poseScriptableObject.closeHands = DetectCloseHands(landmarkPositions[15], landmarkPositions[16]);
+
+        // check for extended arms
+        poseScriptableObject.leftArmExtended = DetectExtendedArm(landmarkPositions[11], landmarkPositions[15]);
+        poseScriptableObject.rightArmExtended = DetectExtendedArm(landmarkPositions[12], landmarkPositions[16]);
+
         // Foot grounded detection
         if (poseScriptableObject.calibrated)
         {
@@ -160,6 +167,8 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.UpdateRightHandPosition(landmarkPositions[16]);
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
         poseScriptableObject.rightFootPosition = landmarkPositions[32];
+
+        poseScriptableObject.UpdateChestPosition((landmarkPositions[11] + landmarkPositions[12]) / 2f );
 
         // Update the rotations of the hands, not fully implemented, just using a vector from the elbow to the wrist
         poseScriptableObject.leftHandRotation = Quaternion.LookRotation((landmarkPositions[15] - landmarkPositions[13]).normalized);
@@ -178,11 +187,6 @@ public class PoseManager : MonoBehaviour
         float pinkyDistance = Vector3.Distance(wrist, pinky);
         float indexDistance = Vector3.Distance(wrist, index);
         float thumbDistance = Vector3.Distance(wrist, thumb);
-
-        // print distances
-        Debug.Log("Pinky distance: " + pinkyDistance);
-        Debug.Log("Index distance: " + indexDistance);
-        Debug.Log("Thumb distance: " + thumbDistance);
 
         // Calculate a dynamic threshold based on hand size (distance between wrist and middle of fingers)
         // float fistThreshold = (pinkyDistance + indexDistance + thumbDistance) / 3.0f * handSizeFactor;
@@ -263,7 +267,18 @@ public class PoseManager : MonoBehaviour
         return isFist;
     }
 
-    // NOT IMPLEMENTED
+
+    private bool DetectCloseHands(Vector3 leftHand, Vector3 rightHand)
+    {
+        return Vector3.Distance(leftHand, rightHand) < 0.25f;
+    }
+
+    private bool DetectExtendedArm(Vector3 shoulder, Vector3 wrist)
+    {
+        return Vector3.Distance(shoulder, wrist) > 0.3f;
+    }
+
+    // Check if feet are in contact with the ground
     private bool isFootGrounded(Vector3 foot, float floorHeight = -0.46f) {
         if (poseScriptableObject.isCalibrated)
         {
