@@ -99,22 +99,22 @@ Shader "Custom/WaterShader"
                 float3 positionOS : POSITION;
                 float4 tangentOS : TANGENT;
                 float3 normalOS : NORMAL;
-                float2 uv : TEXCOORD0;
-				float2 lightmapUV : TEXCOORD1;
+                float4 uv : TEXCOORD0;
 				float4 color : COLOR;
+                float4 custom1 : TEXCOORD1;
+				float2 lightmapUV : TEXCOORD2;
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
+                float4 uv : TEXCOORD0;
 				DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 1);
 				float3 positionOS : TEXCOORD2;
 				float3 positionWS : TEXCOORD3;
                 half4 normalWS : TEXCOORD4;
                 half4 tangentWS : TEXCOORD5;
                 half4 bitangentWS : TEXCOORD6;
-                float2 dissolveUV : TEXCOORD7;
 				
 				#ifdef _ADDITIONAL_LIGHTS_VERTEX
 					half4 fogFactorAndVertexLight : TEXCOORD8;
@@ -157,13 +157,14 @@ Shader "Custom/WaterShader"
                 
                 o.positionCS = TransformWorldToHClip(displacedPositionWS);
                 o.uv = v.uv;
+                o.uv.w = v.custom1.x;
                 o.normalWS = half4(normalInputs.normalWS, viewDirWS.x);
                 o.tangentWS = half4(normalInputs.tangentWS, viewDirWS.y);
                 o.bitangentWS = half4(normalInputs.bitangentWS, viewDirWS.z);
                 o.positionOS = displacedPositionOS;
                 o.positionWS = displacedPositionWS;
-                o.screenPos = ComputeScreenPos(o.positionCS);
 				o.color = v.color;
+                o.screenPos = ComputeScreenPos(o.positionCS);
 
                 return o;
             }
@@ -194,7 +195,7 @@ Shader "Custom/WaterShader"
                 float fresnel = pow(1.0 - saturate(dot(normalize(i.normalWS), normalize(GetCameraPositionWS() - i.positionWS))), _FresnelPower);
 
                 // - Dissolving -
-                float2 offsetUV = i.uv + (0, _Time.y * _DissolveSpeed);
+                float2 offsetUV = (i.uv.xy + i.uv.w)  + (0, _Time.y * _DissolveSpeed);
                 float simpleNoise =  0.1 + SimpleNoise(offsetUV, _DissolveScale) * 0.9;
                 float steppedNoise = step((1 - i.color.a), simpleNoise);
 
