@@ -43,6 +43,7 @@ public class PoseScriptableObject : ScriptableObject
     // Calibration values
     public bool calibrated = false;
     public float hipsToShoulder = 0;
+    public float floorHeight = 0;
     public Vector3 screenspaceHipsPosition = Vector3.zero;
 
 
