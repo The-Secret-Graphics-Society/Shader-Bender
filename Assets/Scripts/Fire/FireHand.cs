@@ -17,6 +17,19 @@ public class FireHand : MonoBehaviour
     void Start()
     {
         // Do nothing :)
+
+    }
+
+    private void OnEnable()
+    {
+        ElementState.onFireActive += EnableFires;
+        ElementState.onElementDeactivate += DisableFires;
+    }
+
+    private void OnDisable()
+    {
+        ElementState.onFireActive -= EnableFires;
+        ElementState.onElementDeactivate -= DisableFires;
     }
 
     void Update()
@@ -35,8 +48,7 @@ public class FireHand : MonoBehaviour
         bool isRightHandCurrentlyRaised = _poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder;
         bool areBothHandsRaised = _poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder;
 
-        ElementState.onFireActive += EnableFires;
-        ElementState.onElementDeactivate += DisableFires;
+        
 
         if (isRightHandCurrentlyRaised && !wasRightHandRaised)
         {
