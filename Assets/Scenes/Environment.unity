@@ -3199,6 +3199,7 @@ MonoBehaviour:
   poseScriptableObject: {fileID: 11400000, guid: 02f1d0327246cfa44ba7cb0f838e0cee,
     type: 2}
   webcamImage: {fileID: 0}
+  disableWebcamImage: 1
 --- !u!1 &1912450868
 GameObject:
   m_ObjectHideFlags: 0

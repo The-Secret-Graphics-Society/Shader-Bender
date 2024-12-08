@@ -126,7 +126,7 @@ public class AoEWindController : MonoBehaviour
 
         if (!_effectActive)
         {
-            Debug.Log("Wind ACTIVE");
+            //Debug.Log("Wind ACTIVE");
             _effectInProgress = false;
             if (FadeOutVisibility())
             {

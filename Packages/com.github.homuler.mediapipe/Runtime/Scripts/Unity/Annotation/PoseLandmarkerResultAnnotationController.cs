@@ -7,7 +7,7 @@ namespace Mediapipe.Unity
 {
     public class PoseLandmarkerResultAnnotationController : AnnotationController<MultiPoseLandmarkListWithMaskAnnotation>
     {
-        public delegate void PoseLandmarksUpdated(List<Mediapipe.Tasks.Components.Containers.Landmark> landmarks);
+        public delegate void PoseLandmarksUpdated(List<Mediapipe.Tasks.Components.Containers.Landmark> landmarks, List<Mediapipe.Tasks.Components.Containers.NormalizedLandmark> normalizedLandmarks);
         public event PoseLandmarksUpdated OnPoseLandmarksUpdated;
         [SerializeField] private bool _visualizeZ = false;
 
@@ -54,7 +54,8 @@ namespace Mediapipe.Unity
                 {
                     //annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
                     List<Landmarks> landmarks = _currentTarget.poseWorldLandmarks;
-                    OnPoseLandmarksUpdated?.Invoke(landmarks[0].landmarks);
+                    List<NormalizedLandmarks> normalizedLandmarks = _currentTarget.poseLandmarks;
+                    OnPoseLandmarksUpdated?.Invoke(landmarks[0].landmarks, normalizedLandmarks[0].landmarks);
                 }
             }
         }

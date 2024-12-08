@@ -42,17 +42,19 @@ public class PoseScriptableObject : ScriptableObject
 
     // Calibration values
     public bool calibrated = false;
-    public float hipsToShoulder = 0;
-    public float floorHeight = 0;
-    public Vector3 screenspaceHipsPosition = Vector3.zero;
+    public float hipsToShoulder = 0f;
+    public float screenspaceHipsToShoulder = 0f;
+    public float screenspaceToWorldspaceScale = 0f;
+    public float floorHeight = 0f;
+    public Vector3 screenspaceHipsPosition;
+    public Vector3 screenspaceCurrentHipsPosition;
 
-
-    [SerializeField, Tooltip("Maximum size for hand position LinkedLists")]
-    private float maxHandPositionHistory = 120;
-
-    // Calibration Stats
+    // Calibration states
     public bool isCalibrated = false;
     public bool calibrating = false;
+
+    [SerializeField, Tooltip("Maximum size for hand position LinkedLists")]
+    private float maxPositionHistory = 120;
 
     public void Initialise()
     {
@@ -74,8 +76,10 @@ public class PoseScriptableObject : ScriptableObject
         leftArmExtended = rightArmExtended = false;
         closeHands = false;
 
-        isCalibrated = false;
-        calibrating = false;
+        hipsToShoulder = screenspaceHipsToShoulder = screenspaceToWorldspaceScale = floorHeight = 0f;
+
+        screenspaceHipsPosition = screenspaceCurrentHipsPosition = Vector3.zero;
+        isCalibrated = calibrating = false;
     }
 
     public Vector3 GetCurrentLeftHandPosition()
@@ -90,7 +94,7 @@ public class PoseScriptableObject : ScriptableObject
 
     public void UpdateLeftHandPosition(Vector3 newPosition)
     {
-        if (leftHandPositions.Count >= maxHandPositionHistory)
+        if (leftHandPositions.Count >= maxPositionHistory)
         {
             leftHandPositions.RemoveLast();
         }
@@ -99,7 +103,7 @@ public class PoseScriptableObject : ScriptableObject
 
     public void UpdateRightHandPosition(Vector3 newPosition)
     {
-        if (rightHandPositions.Count >= maxHandPositionHistory)
+        if (rightHandPositions.Count >= maxPositionHistory)
         {
             rightHandPositions.RemoveLast();
         }
@@ -108,7 +112,7 @@ public class PoseScriptableObject : ScriptableObject
 
     public void UpdateChestPosition(Vector3 newPosition)
     {
-        if (chestPositions.Count >= maxHandPositionHistory)
+        if (chestPositions.Count >= maxPositionHistory)
         {
             chestPositions.RemoveLast();
         }
