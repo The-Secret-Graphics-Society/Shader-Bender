@@ -10,6 +10,8 @@ public class PoseScriptableObject : ScriptableObject
     private LinkedList<Vector3> chestPositions = new LinkedList<Vector3>();
     public Quaternion leftHandRotation;
     public Quaternion rightHandRotation;
+    public float leftHandSpeed = 0f;
+    public float rightHandSpeed = 0f;
 
     // Hand states
     public bool isLeftFistClenched;
@@ -62,6 +64,8 @@ public class PoseScriptableObject : ScriptableObject
         rightHandPositions.Clear();
         chestPositions.Clear();
 
+        leftHandSpeed = rightHandSpeed = 0f;
+
         isLeftFistClenched = isRightFistClenched = false;
         isLeftHandAboveShoulder = isRightHandAboveShoulder = false;
 
@@ -94,6 +98,11 @@ public class PoseScriptableObject : ScriptableObject
 
     public void UpdateLeftHandPosition(Vector3 newPosition)
     {
+        if (leftHandPositions.Count > 0)
+        {
+            leftHandSpeed = (newPosition - leftHandPositions.First.Value).magnitude;
+        }
+
         if (leftHandPositions.Count >= maxPositionHistory)
         {
             leftHandPositions.RemoveLast();
@@ -103,6 +112,11 @@ public class PoseScriptableObject : ScriptableObject
 
     public void UpdateRightHandPosition(Vector3 newPosition)
     {
+        if (rightHandPositions.Count > 0)
+        {
+            rightHandSpeed = (newPosition - rightHandPositions.First.Value).magnitude;
+        }
+        
         if (rightHandPositions.Count >= maxPositionHistory)
         {
             rightHandPositions.RemoveLast();
