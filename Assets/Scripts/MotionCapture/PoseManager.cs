@@ -3,7 +3,13 @@ using UnityEngine;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity;
 using Mediapipe.Tasks.Components.Containers;
+using System.Collections;
+using UnityEditor;
+using System.Net.NetworkInformation;
+using System;
+using UnityEngine.ProBuilder.Shapes;
 
+[CustomEditor(typeof(PoseManager))] 
 public class PoseManager : MonoBehaviour
 {
     [Header("Component References")]
@@ -28,6 +34,11 @@ public class PoseManager : MonoBehaviour
     private KalmanFilter[] landmarkFilters = new KalmanFilter[33];
     private Vector3[] landmarkPositions = new Vector3[33];
 
+    float fistThreshold;
+    float pointThreshold;
+    float pinkyThreshold;
+    float thumbThreshold;
+
 
     void Awake()
     {
@@ -40,6 +51,7 @@ public class PoseManager : MonoBehaviour
     void Start()
     {
         poseScriptableObject.Initialise();
+        
 
         // Initialise cubes and Kalman filtering for each landmark
         foreach (int index in landmarkIndices)
@@ -50,6 +62,8 @@ public class PoseManager : MonoBehaviour
 
             KalmanFilter filter = new KalmanFilter(Vector3.zero, processNoise, measurementNoise);
             landmarkFilters[index] = filter;
+
+
 
             // Disable rendering cubes representing hand or ear landmarks or if we don't want to render them
             if (index == 7 || index == 8 || (index >= 17 && index <= 22) || !renderCubes)
@@ -63,6 +77,9 @@ public class PoseManager : MonoBehaviour
 
         // Subscribe to the landmarks updated event
         annotationController.OnPoseLandmarksUpdated += OnPoseLandmarksUpdated;
+
+        // Start the calibration process
+        StartCoroutine(StartupCalibrateToPlayer(5));
     }
 
     void OnPoseLandmarksUpdated(List<Landmark> landmarks)
@@ -77,6 +94,29 @@ public class PoseManager : MonoBehaviour
 
             var landmark = landmarks[index];
             Vector3 worldPosition = new Vector3(landmark.x, -landmark.y, landmark.z);
+
+            // Offset based on calibration
+
+            if (poseScriptableObject.isCalibrated)
+            {
+                // Get the distance to floor based on the foot closest to the floor (cannot jump)
+                float leftFootDist = poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight;
+                float rightFoot = poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight;
+
+                if (Mathf.Abs(leftFootDist) < Mathf.Abs(rightFoot))
+                {
+                    worldPosition.y -= leftFootDist;
+                }
+                else
+                {
+                    worldPosition.y -= rightFoot;
+                }
+
+                float distanceToFloor = Mathf.Min(Mathf.Abs(poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight), 
+                                                      Mathf.Abs(poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight));
+
+                worldPosition.y -= distanceToFloor;
+            }
 
             // Apply Kalman filtering
             KalmanFilter filter = landmarkFilters[index];
@@ -96,27 +136,39 @@ public class PoseManager : MonoBehaviour
         GameObject leftHand = landmarkCubes[15];
         if (leftHand != null)
         {
-            poseScriptableObject.isLeftFistClenched = DetectFist(leftHand, landmarkPositions[15], landmarkPositions[17], landmarkPositions[19], landmarkPositions[21]);
+            poseScriptableObject.isLeftFistClenched = DetectFist(leftHand, landmarkPositions[15], landmarkPositions[17], landmarkPositions[19], landmarkPositions[21], true);
         }
         GameObject rightHand = landmarkCubes[16];
         if (rightHand != null)
         {
-            poseScriptableObject.isRightFistClenched = DetectFist(rightHand, landmarkPositions[16], landmarkPositions[18], landmarkPositions[20], landmarkPositions[22]);
+            poseScriptableObject.isRightFistClenched = DetectFist(rightHand, landmarkPositions[16], landmarkPositions[18], landmarkPositions[20], landmarkPositions[22], false);
         }
 
         // Hand above shoulder detection, not fully implemented?
         poseScriptableObject.isLeftHandAboveShoulder = landmarkPositions[11].y < landmarkPositions[15].y;
         poseScriptableObject.isRightHandAboveShoulder = landmarkPositions[12].y < landmarkPositions[16].y;
 
-        // Foot grounded detection, not fully implemented
-        poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31]);
-        poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32]);
+        // check for close hands
+        poseScriptableObject.closeHands = DetectCloseHands(landmarkPositions[15], landmarkPositions[16]);
+
+        // check for extended arms
+        poseScriptableObject.leftArmExtended = DetectExtendedArm(landmarkPositions[11], landmarkPositions[15]);
+        poseScriptableObject.rightArmExtended = DetectExtendedArm(landmarkPositions[12], landmarkPositions[16]);
+
+        // Foot grounded detection
+        if (poseScriptableObject.calibrated)
+        {
+            poseScriptableObject.isLeftFootGrounded = isFootGrounded(landmarkPositions[31], poseScriptableObject.floorHeight);
+            poseScriptableObject.isRightFootGrounded = isFootGrounded(landmarkPositions[32], poseScriptableObject.floorHeight);
+        }
 
         // Update hand and foot positions
         poseScriptableObject.UpdateLeftHandPosition(landmarkPositions[15]);
         poseScriptableObject.UpdateRightHandPosition(landmarkPositions[16]);
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
-        poseScriptableObject.leftFootPosition = landmarkPositions[32];
+        poseScriptableObject.rightFootPosition = landmarkPositions[32];
+
+        poseScriptableObject.UpdateChestPosition((landmarkPositions[11] + landmarkPositions[12]) / 2f );
 
         // Update the rotations of the hands, not fully implemented, just using a vector from the elbow to the wrist
         poseScriptableObject.leftHandRotation = Quaternion.LookRotation((landmarkPositions[15] - landmarkPositions[13]).normalized);
@@ -129,7 +181,7 @@ public class PoseManager : MonoBehaviour
         }
     }
 
-    private bool DetectFist(GameObject wristCube, Vector3 wrist, Vector3 pinky, Vector3 index, Vector3 thumb)
+    private bool DetectFist(GameObject wristCube, Vector3 wrist, Vector3 pinky, Vector3 index, Vector3 thumb, bool left)
     {
         // Calculate distances between wrist and finger landmarks
         float pinkyDistance = Vector3.Distance(wrist, pinky);
@@ -139,14 +191,65 @@ public class PoseManager : MonoBehaviour
         // Calculate a dynamic threshold based on hand size (distance between wrist and middle of fingers)
         // float fistThreshold = (pinkyDistance + indexDistance + thumbDistance) / 3.0f * handSizeFactor;
         // This should be done at calibration, with the size of the open fist used
-        float fistThreshold = handSizeFactor;
+
+        // if not calibrated
+        if (!poseScriptableObject.isCalibrated)
+        {
+            fistThreshold = handSizeFactor;
+        }
+        if (left)
+        {
+            poseScriptableObject.isLeftPinkyExtended = false;
+            poseScriptableObject.isLeftIndexExtended = false;
+            poseScriptableObject.isLeftThumbExtended = false;
+        }
+        else
+        {
+            poseScriptableObject.isRightPinkyExtended = false;
+            poseScriptableObject.isRightIndexExtended = false;
+            poseScriptableObject.isRightThumbExtended = false;
+        }
 
         // Check if each finger is curled in (distance below threshold) and
         // decide if it's a fist based on the number of curled fingers
         int curledFingers = 0;
-        if (pinkyDistance < fistThreshold) curledFingers++;
-        if (indexDistance < fistThreshold) curledFingers++;
-        if (thumbDistance < fistThreshold) curledFingers++;
+        if (pinkyDistance < pinkyThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftPinkyExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isRightPinkyExtended = true;
+            }
+            curledFingers++;
+        }
+        if (indexDistance < pointThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftIndexExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isLeftIndexExtended = true;
+            }
+            curledFingers++;
+        }
+        if (thumbDistance < thumbThreshold)
+        {
+            if (left)
+            {
+                poseScriptableObject.isLeftThumbExtended = true;
+            }
+            else
+            {
+                poseScriptableObject.isRightThumbExtended = true;
+            }
+            poseScriptableObject.isLeftThumbExtended = true;
+            curledFingers++;
+        }
         bool isFist = curledFingers >= 2;
 
         if (wristCube.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
@@ -164,9 +267,90 @@ public class PoseManager : MonoBehaviour
         return isFist;
     }
 
-    // NOT IMPLEMENTED
+
+    private bool DetectCloseHands(Vector3 leftHand, Vector3 rightHand)
+    {
+        return Vector3.Distance(leftHand, rightHand) < 0.25f;
+    }
+
+    private bool DetectExtendedArm(Vector3 shoulder, Vector3 wrist)
+    {
+        return Vector3.Distance(shoulder, wrist) > 0.3f;
+    }
+
+    // Check if feet are in contact with the ground
     private bool isFootGrounded(Vector3 foot, float floorHeight = -0.46f) {
-        return foot.y < floorHeight + 0.1f;
+        if (poseScriptableObject.isCalibrated)
+        {
+            return foot.y < poseScriptableObject.floorHeight + 0.1f;
+        }
+        else {
+            return foot.y < floorHeight + 0.1f;
+        }
+    }
+
+    private IEnumerator StartupCalibrateToPlayer(int seconds = 5)
+    {
+        poseScriptableObject.calibrating = true;
+        Debug.Log("Calibrating to player...");
+
+        for (int i = 0; i < seconds; i++)
+        {
+            yield return new WaitForSeconds(1f);
+            Debug.Log($"{seconds-i}...");
+        }
+
+        CalibrateToPlayer();
+    }
+
+    private void CalibrateToPlayer()
+    {
+        // Set the floor height to the lowest foot position
+        poseScriptableObject.floorHeight = Mathf.Min(poseScriptableObject.leftFootPosition.y, poseScriptableObject.rightFootPosition.y);
+
+        //poseScriptableObject.defaultHipPosition = (landmarkPositions[23] + landmarkPositions[24])/2f;
+
+        // Set the hips to shoulder distance to the distance between the hips and shoulders
+        //poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24])/2f , (landmarkPositions[12]+ landmarkPositions[11])/2f);
+
+        // Set the screen space hips position to the hips position projected onto the screen
+        //poseScriptableObject.screenspaceHipsPosition = Camera.main.WorldToScreenPoint(landmarkPositions[24]);
+
+        // set distance between palm and thumb (HandSizeFactor)
+        //poseScriptableObject.palmToThumb = Vector3.Distance(landmarkPositions[15], landmarkPositions[20]);
+        // Calculate distances between wrist and finger landmarks
+        float pinkyDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[17]);
+        float indexDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[19]);
+        float thumbDistanceL = Vector3.Distance(landmarkPositions[15], landmarkPositions[21]);
+
+        float pinkyDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[18]);
+        float indexDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[20]);
+        float thumbDistanceR = Vector3.Distance(landmarkPositions[16], landmarkPositions[22]);
+
+        // Calculate a dynamic threshold based on hand size (distance between wrist and middle of fingers) from both hands
+        //fistThreshold = (pinkyDistanceL + pinkyDistanceR + indexDistanceL + indexDistanceR + thumbDistanceL + thumbDistanceR)/ 6.0f * handSizeFactor;
+
+        pointThreshold = (indexDistanceL + indexDistanceR) / 2.0f * 0.6f;
+        pinkyThreshold = (pinkyDistanceL + pinkyDistanceR) / 2.0f * 0.6f;
+        thumbThreshold = (thumbDistanceL + thumbDistanceR) / 2.0f * 0.6f;
+
+        //print point, pinky and thumb thresholds
+        Debug.Log("Point threshold: " + pointThreshold);
+        Debug.Log("Pinky threshold: " + pinkyThreshold);
+        Debug.Log("Thumb threshold: " + thumbThreshold);
+
+        // Set the calibrated flag to true
+        poseScriptableObject.calibrating = false;
+        poseScriptableObject.isCalibrated = true;
+        Debug.Log("Calibrated to player!");
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            StartCoroutine(StartupCalibrateToPlayer());
+        }
     }
 
     void OnDestroy()

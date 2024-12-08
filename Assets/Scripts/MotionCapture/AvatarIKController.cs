@@ -9,6 +9,8 @@ public class AvatarIKController : MonoBehaviour
     [SerializeField] private Transform rightFootTarget;
     [SerializeField] private Transform headTarget;
     [SerializeField] private Transform head_L;
+    [SerializeField] private Transform fingers_L;
+    [SerializeField] private Transform fingers_R;
 
     // Scale factors to adjust the size of the avatar to match the landmarks
     [Header("Scale Factors")]
@@ -70,12 +72,16 @@ public class AvatarIKController : MonoBehaviour
         transform.rotation = bodyRotation;
 
         // Update hand targets
-        leftHandTarget.position = ScaleLandmarkVector(landmarks[19]) + positionOffset;
-        rightHandTarget.position = ScaleLandmarkVector(landmarks[20]) + positionOffset;
+        leftHandTarget.position = ScaleLandmarkVector(landmarks[15]) + positionOffset;
+        rightHandTarget.position = ScaleLandmarkVector(landmarks[16]) + positionOffset;
 
         // Update foot targets
         leftFootTarget.position = ScaleLandmarkVector(landmarks[31]) + positionOffset;
         rightFootTarget.position = ScaleLandmarkVector(landmarks[32]) + positionOffset;
+
+        // Update finger targets
+        fingers_L.position = ScaleLandmarkVector(landmarks[19]) + positionOffset;
+        fingers_R.position = ScaleLandmarkVector(landmarks[20]) + positionOffset;
 
         // Update head target
         // Rotation is in the neck, thus we need to rotate from there

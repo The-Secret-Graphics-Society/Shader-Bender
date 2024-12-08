@@ -7,6 +7,7 @@ public class PoseScriptableObject : ScriptableObject
     // Hand positions
     private LinkedList<Vector3> leftHandPositions = new LinkedList<Vector3>();
     private LinkedList<Vector3> rightHandPositions = new LinkedList<Vector3>();
+    private LinkedList<Vector3> chestPositions = new LinkedList<Vector3>();
     public Quaternion leftHandRotation;
     public Quaternion rightHandRotation;
 
@@ -16,6 +17,21 @@ public class PoseScriptableObject : ScriptableObject
     public bool isLeftHandAboveShoulder;
     public bool isRightHandAboveShoulder;
 
+    // Finger states
+    public bool isLeftIndexExtended;
+    public bool isRightIndexExtended;
+    public bool isLeftThumbExtended;
+    public bool isRightThumbExtended;
+    public bool isLeftPinkyExtended;
+    public bool isRightPinkyExtended;
+
+
+    // Hand states
+    public bool closeHands;
+    public bool leftArmExtended;
+    public bool rightArmExtended;
+
+
     // Foot positions
     public Vector3 leftFootPosition;
     public Vector3 rightFootPosition;
@@ -24,13 +40,25 @@ public class PoseScriptableObject : ScriptableObject
     public bool isLeftFootGrounded;
     public bool isRightFootGrounded;
 
+    // Calibration values
+    public bool calibrated = false;
+    public float hipsToShoulder = 0;
+    public float floorHeight = 0;
+    public Vector3 screenspaceHipsPosition = Vector3.zero;
+
+
     [SerializeField, Tooltip("Maximum size for hand position LinkedLists")]
     private float maxHandPositionHistory = 120;
+
+    // Calibration Stats
+    public bool isCalibrated = false;
+    public bool calibrating = false;
 
     public void Initialise()
     {
         leftHandPositions.Clear();
         rightHandPositions.Clear();
+        chestPositions.Clear();
 
         isLeftFistClenched = isRightFistClenched = false;
         isLeftHandAboveShoulder = isRightHandAboveShoulder = false;
@@ -39,6 +67,15 @@ public class PoseScriptableObject : ScriptableObject
         rightFootPosition = Vector3.zero;
         
         isLeftFootGrounded = isRightFootGrounded = false;
+
+        isLeftIndexExtended = isRightIndexExtended = false;
+        isLeftThumbExtended = isRightThumbExtended = false;
+        isLeftPinkyExtended = isRightPinkyExtended = false;
+        leftArmExtended = rightArmExtended = false;
+        closeHands = false;
+
+        isCalibrated = false;
+        calibrating = false;
     }
 
     public Vector3 GetCurrentLeftHandPosition()
@@ -69,9 +106,28 @@ public class PoseScriptableObject : ScriptableObject
         rightHandPositions.AddFirst(newPosition);
     }
 
+    public void UpdateChestPosition(Vector3 newPosition)
+    {
+        if (chestPositions.Count >= maxHandPositionHistory)
+        {
+            chestPositions.RemoveLast();
+        }
+        chestPositions.AddFirst(newPosition);
+    }
+
     public void ClearHandPositions()
     {
         leftHandPositions.Clear();
         rightHandPositions.Clear();
+    }
+
+    public void ClearChestPosition()
+    {
+        chestPositions.Clear();
+    }
+
+    public Vector3 GetCurrentChestPosition()
+    {
+        return chestPositions.First?.Value ?? Vector3.zero;
     }
 }

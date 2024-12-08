@@ -12,12 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6763464b4f752834e8f924206de2eb31, type: 3}
   m_Name: PoseScriptableObject
   m_EditorClassIdentifier: 
+  leftHandRotation: {x: -0.022987101, y: 0.8800947, z: -0.472303, w: -0.042834416}
+  rightHandRotation: {x: 0.03549768, y: 0.94438916, z: -0.30829328, w: 0.1087394}
   isLeftFistClenched: 0
   isRightFistClenched: 0
   isLeftHandAboveShoulder: 0
   isRightHandAboveShoulder: 0
-  leftFootPosition: {x: 0, y: 0, z: 0}
+  isLeftIndexExtended: 0
+  isRightIndexExtended: 0
+  isLeftThumbExtended: 0
+  isRightThumbExtended: 0
+  isLeftPinkyExtended: 0
+  isRightPinkyExtended: 0
+  leftFootPosition: {x: -0.032341585, y: 0.3445055, z: -0.53482}
   rightFootPosition: {x: 0, y: 0, z: 0}
   isLeftFootGrounded: 0
   isRightFootGrounded: 0
   maxHandPositionHistory: 120
+  floorHeight: 0
+  isCalibrated: 1
+  calibrating: 0

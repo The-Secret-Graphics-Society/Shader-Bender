@@ -19,6 +19,7 @@ public class AoEWindController : MonoBehaviour
     [Tooltip("The time in seconds the effect last")]
     [Range(1, 10)]
     [SerializeField] private float _effectDuration = 5;
+    [SerializeField] private bool _effectActive = false;
 
     private delegate void AoEWindControllerDelegate();
 
@@ -56,11 +57,15 @@ public class AoEWindController : MonoBehaviour
 
     private void OnEnable()
     {
+        ElementState.onAirActive += ActivateAirPower;
+        ElementState.onElementDeactivate += DeactivateAirPower;
         OnAoEActivated += ActivateAoEWind;
     }
 
     private void OnDisable()
     {
+        ElementState.onAirActive -= ActivateAirPower;
+        ElementState.onElementDeactivate -= DeactivateAirPower;
         OnAoEActivated -= ActivateAoEWind;
     }
 
@@ -99,17 +104,29 @@ public class AoEWindController : MonoBehaviour
             throw new NullReferenceException("The PoseScriptableObject is missing on the AoEWindController");
     }
 
+
+    private void ActivateAirPower()
+    {
+        _effectActive = true;
+    }
+
+    private void DeactivateAirPower()
+    {
+        _effectActive = false;
+    }
+
     /// <summary>
     /// Holds the mechanics based on the positions of the hands
     /// </summary>
     private void AoEMechanicsLogic()
     {
 
-        if (_poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder && !_effectInProgress)
+        if (_effectActive && !_effectInProgress)
             _effectInProgress = true;
 
-        if (!_poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder)
+        if (!_effectActive)
         {
+            Debug.Log("Wind ACTIVE");
             _effectInProgress = false;
             if (FadeOutVisibility())
             {

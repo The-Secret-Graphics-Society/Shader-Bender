@@ -17,6 +17,19 @@ public class FireHand : MonoBehaviour
     void Start()
     {
         // Do nothing :)
+
+    }
+
+    private void OnEnable()
+    {
+        ElementState.onFireActive += EnableFires;
+        ElementState.onElementDeactivate += DisableFires;
+    }
+
+    private void OnDisable()
+    {
+        ElementState.onFireActive -= EnableFires;
+        ElementState.onElementDeactivate -= DisableFires;
     }
 
     void Update()
@@ -35,15 +48,7 @@ public class FireHand : MonoBehaviour
         bool isRightHandCurrentlyRaised = _poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder;
         bool areBothHandsRaised = _poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder;
 
-        if (areBothHandsRaised)
-        {
-            if (isFireActive)
-            {
-                DisableFire(rightHandFire);
-                if (fireInBothHands) DisableFire(leftHandFire);
-            }
-            return;
-        }
+        
 
         if (isRightHandCurrentlyRaised && !wasRightHandRaised)
         {
@@ -60,6 +65,33 @@ public class FireHand : MonoBehaviour
         }
 
         wasRightHandRaised = isRightHandCurrentlyRaised;
+    }
+
+    void EnableFires()
+    {
+        if (rightHandFire != null)
+        {
+            rightHandFire.Play();
+            isFireActive = true;
+        }
+        if (leftHandFire != null)
+        {
+            leftHandFire.Play();
+            isFireActive = true;
+        }
+    }
+    void DisableFires()
+    {
+        if (rightHandFire != null)
+        {
+            rightHandFire.Stop();
+            isFireActive = false;
+        }
+        if (leftHandFire != null)
+        {
+            leftHandFire.Stop();
+            isFireActive = false;
+        }
     }
 
     void EnableFire(ParticleSystem particleSystem)
