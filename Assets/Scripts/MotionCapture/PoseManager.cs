@@ -1,15 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity;
 using Mediapipe.Tasks.Components.Containers;
 using System.Collections;
 using UnityEditor;
-using System.Net.NetworkInformation;
-using System;
-using UnityEngine.ProBuilder.Shapes;
 
-[CustomEditor(typeof(PoseManager))] 
+[CustomEditor(typeof(PoseManager))]
 public class PoseManager : MonoBehaviour
 {
     [Header("Component References")]
@@ -25,6 +21,8 @@ public class PoseManager : MonoBehaviour
     private float processNoise = 0.0001f;
     [SerializeField, Tooltip("Kalman measurement noise, higher values make the filtering trust measurements less.")]
     private float measurementNoise = 0.01f;
+    [SerializeField, Tooltip("How much to scale normalised coordinates by (for character positioning).")]
+    private float screenspaceToWorldspaceScale = 1f;
 
     // Indices of the pose landmarks to track
     private int[] landmarkIndices = { 0, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
@@ -34,11 +32,10 @@ public class PoseManager : MonoBehaviour
     private KalmanFilter[] landmarkFilters = new KalmanFilter[33];
     private Vector3[] landmarkPositions = new Vector3[33];
 
-    float fistThreshold;
-    float pointThreshold;
-    float pinkyThreshold;
-    float thumbThreshold;
-
+    private float fistThreshold;
+    private float pointThreshold;
+    private float pinkyThreshold;
+    private float thumbThreshold;
 
     void Awake()
     {
@@ -51,7 +48,6 @@ public class PoseManager : MonoBehaviour
     void Start()
     {
         poseScriptableObject.Initialise();
-        
 
         // Initialise cubes and Kalman filtering for each landmark
         foreach (int index in landmarkIndices)
@@ -62,8 +58,6 @@ public class PoseManager : MonoBehaviour
 
             KalmanFilter filter = new KalmanFilter(Vector3.zero, processNoise, measurementNoise);
             landmarkFilters[index] = filter;
-
-
 
             // Disable rendering cubes representing hand or ear landmarks or if we don't want to render them
             if (index == 7 || index == 8 || (index >= 17 && index <= 22) || !renderCubes)
@@ -82,10 +76,28 @@ public class PoseManager : MonoBehaviour
         StartCoroutine(StartupCalibrateToPlayer(5));
     }
 
-    void OnPoseLandmarksUpdated(List<Landmark> landmarks)
+    void OnPoseLandmarksUpdated(List<Landmark> landmarks, List<NormalizedLandmark> normalizedLandmarks)
     {
         if (landmarks == null || landmarks.Count == 0)
             return;
+
+        // Use the screenspace position of the hips to calculate the offset for the character
+        if (!(normalizedLandmarks == null || normalizedLandmarks.Count == 0))
+        {
+            Vector3 landmark11 = new Vector3(normalizedLandmarks[11].x * 2 - 1, -((normalizedLandmarks[11].y * 2 - 1) / (16 / 9)), normalizedLandmarks[11].z * 2);
+            Vector3 landmark12 = new Vector3(normalizedLandmarks[12].x * 2 - 1, -((normalizedLandmarks[12].y * 2 - 1) / (16 / 9)), normalizedLandmarks[12].z * 2);
+            Vector3 landmark23 = new Vector3(normalizedLandmarks[23].x * 2 - 1, -((normalizedLandmarks[23].y * 2 - 1) / (16 / 9)), normalizedLandmarks[23].z * 2);
+            Vector3 landmark24 = new Vector3(normalizedLandmarks[24].x * 2 - 1, -((normalizedLandmarks[24].y * 2 - 1) / (16 / 9)), normalizedLandmarks[24].z * 2);
+            poseScriptableObject.screenspaceCurrentHipsPosition = (landmark23 + landmark24) / 2f;
+            poseScriptableObject.screenspaceHipsToShoulder = Vector3.Distance((landmark23 + landmark24) / 2f, (landmark11 + landmark12) / 2f);
+        }
+
+        // Offset based on calibration
+        Vector3 offset = Vector3.zero;
+        if (poseScriptableObject.isCalibrated)
+        {
+            offset = (poseScriptableObject.screenspaceCurrentHipsPosition - poseScriptableObject.screenspaceHipsPosition) * poseScriptableObject.screenspaceToWorldspaceScale;
+        }
 
         foreach (int index in landmarkIndices)
         {
@@ -93,30 +105,7 @@ public class PoseManager : MonoBehaviour
                 continue;
 
             var landmark = landmarks[index];
-            Vector3 worldPosition = new Vector3(landmark.x, -landmark.y, landmark.z);
-
-            // Offset based on calibration
-
-            if (poseScriptableObject.isCalibrated)
-            {
-                // Get the distance to floor based on the foot closest to the floor (cannot jump)
-                float leftFootDist = poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight;
-                float rightFoot = poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight;
-
-                if (Mathf.Abs(leftFootDist) < Mathf.Abs(rightFoot))
-                {
-                    worldPosition.y -= leftFootDist;
-                }
-                else
-                {
-                    worldPosition.y -= rightFoot;
-                }
-
-                float distanceToFloor = Mathf.Min(Mathf.Abs(poseScriptableObject.leftFootPosition.y - poseScriptableObject.floorHeight), 
-                                                      Mathf.Abs(poseScriptableObject.rightFootPosition.y - poseScriptableObject.floorHeight));
-
-                worldPosition.y -= distanceToFloor;
-            }
+            Vector3 worldPosition = new Vector3(landmark.x, -landmark.y, landmark.z) + offset;
 
             // Apply Kalman filtering
             KalmanFilter filter = landmarkFilters[index];
@@ -168,7 +157,7 @@ public class PoseManager : MonoBehaviour
         poseScriptableObject.leftFootPosition = landmarkPositions[31];
         poseScriptableObject.rightFootPosition = landmarkPositions[32];
 
-        poseScriptableObject.UpdateChestPosition((landmarkPositions[11] + landmarkPositions[12]) / 2f );
+        poseScriptableObject.UpdateChestPosition((landmarkPositions[11] + landmarkPositions[12]) / 2f);
 
         // Update the rotations of the hands, not fully implemented, just using a vector from the elbow to the wrist
         poseScriptableObject.leftHandRotation = Quaternion.LookRotation((landmarkPositions[15] - landmarkPositions[13]).normalized);
@@ -279,12 +268,14 @@ public class PoseManager : MonoBehaviour
     }
 
     // Check if feet are in contact with the ground
-    private bool isFootGrounded(Vector3 foot, float floorHeight = -0.46f) {
+    private bool isFootGrounded(Vector3 foot, float floorHeight = -0.46f)
+    {
         if (poseScriptableObject.isCalibrated)
         {
             return foot.y < poseScriptableObject.floorHeight + 0.1f;
         }
-        else {
+        else
+        {
             return foot.y < floorHeight + 0.1f;
         }
     }
@@ -297,7 +288,7 @@ public class PoseManager : MonoBehaviour
         for (int i = 0; i < seconds; i++)
         {
             yield return new WaitForSeconds(1f);
-            Debug.Log($"{seconds-i}...");
+            Debug.Log($"{seconds - i}...");
         }
 
         CalibrateToPlayer();
@@ -308,13 +299,12 @@ public class PoseManager : MonoBehaviour
         // Set the floor height to the lowest foot position
         poseScriptableObject.floorHeight = Mathf.Min(poseScriptableObject.leftFootPosition.y, poseScriptableObject.rightFootPosition.y);
 
-        //poseScriptableObject.defaultHipPosition = (landmarkPositions[23] + landmarkPositions[24])/2f;
-
         // Set the hips to shoulder distance to the distance between the hips and shoulders
-        //poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24])/2f , (landmarkPositions[12]+ landmarkPositions[11])/2f);
+        poseScriptableObject.hipsToShoulder = Vector3.Distance((landmarkPositions[23] + landmarkPositions[24]) / 2f, (landmarkPositions[12] + landmarkPositions[11]) / 2f);
+        poseScriptableObject.screenspaceToWorldspaceScale = screenspaceToWorldspaceScale = poseScriptableObject.hipsToShoulder / poseScriptableObject.screenspaceHipsToShoulder;
 
         // Set the screen space hips position to the hips position projected onto the screen
-        //poseScriptableObject.screenspaceHipsPosition = Camera.main.WorldToScreenPoint(landmarkPositions[24]);
+        poseScriptableObject.screenspaceHipsPosition = poseScriptableObject.screenspaceCurrentHipsPosition;
 
         // set distance between palm and thumb (HandSizeFactor)
         //poseScriptableObject.palmToThumb = Vector3.Distance(landmarkPositions[15], landmarkPositions[20]);

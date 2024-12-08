@@ -7,6 +7,7 @@ public class DisableWhenCalibrated : MonoBehaviour
 {
     [SerializeField] private PoseScriptableObject poseScriptableObject;
     [SerializeField] private RawImage webcamImage;
+    [SerializeField] private bool disableWebcamImage = false;
 
     void Awake()
     {
@@ -16,7 +17,7 @@ public class DisableWhenCalibrated : MonoBehaviour
     // Should use c# events to subscribe to calibration events
     private void Update()
     {
-        if (poseScriptableObject.calibrating)
+        if (poseScriptableObject.calibrating && !disableWebcamImage)
         {
             // make webcam image transparent
             webcamImage.material.color = new Color(1, 1, 1, 1f);
