@@ -2570,6 +2570,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireManager
       objectReference: {fileID: 0}
+    - target: {fileID: 7897279547600910425, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8312413307380400318, guid: de9734e3220f18846b591acb40d21f2d,
         type: 3}
       propertyPath: emitterVelocityMode
@@ -3397,6 +3402,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: LightningNoseTrail
       objectReference: {fileID: 0}
+    - target: {fileID: 3124408334524964636, guid: 9f3a53d0f7598ad4b884f56f6bbfefd7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3509349228448077362, guid: 9f3a53d0f7598ad4b884f56f6bbfefd7,
         type: 3}
       propertyPath: ShapeModule.m_Scale.x
@@ -3927,6 +3937,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LightningManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536607652666510324, guid: ca5e0672614224b43a24818ad7896347,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
