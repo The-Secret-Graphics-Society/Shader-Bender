@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class BurnEffect : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem part;
+    [SerializeField] private ParticleSystem fireParticles;
     [SerializeField] private List<ParticleCollisionEvent> collisionEvents;
     [SerializeField] private float burnIncrement = 0.05f;
     
 
     void Start()
     {
-        part = GetComponent<ParticleSystem>();
+        fireParticles = GetComponent<ParticleSystem>();
         collisionEvents = new List<ParticleCollisionEvent>();
     }
 

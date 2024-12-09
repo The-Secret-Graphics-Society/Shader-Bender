@@ -4,46 +4,38 @@ using UnityEngine;
 
 public class MeteorSound : MonoBehaviour
 {
-    private ParticleSystem _parentParticleSystem;
+public AudioSource source;          
+    public AudioClip meteorFall;        
+    public AudioClip meteorImpact;      
 
-    private int _currentNumberOfParticles = 0;
+    private bool hasFallen = false;
 
-    public AudioSource source;
-    public AudioClip meteorFall;
-    public AudioClip meteorImpact;
-
-    private bool isMeteorFallPlaying = false;
-
-    // Start is called before the first frame update
-    void Start()
+    // Called when the meteor starts falling
+    public void StartFalling()
     {
-        _parentParticleSystem = this.GetComponent<ParticleSystem>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (_parentParticleSystem.particleCount > _currentNumberOfParticles)
+        if (!hasFallen)
         {
             source.PlayOneShot(meteorFall);
-            isMeteorFallPlaying = true;
+            hasFallen = true;
 
-            // Start a coroutine to wait for meteorFall to finish before playing meteorImpact.
+            // Start a coroutine to play the impact sound after the fall sound finishes
             StartCoroutine(PlayImpactAfterFall());
         }
-
-        _currentNumberOfParticles = _parentParticleSystem.particleCount;
     }
-    
+
+    // Called when the meteor impacts (if the impact is event-driven)
+    public void Impact()
+    {
+        if (!hasFallen) return; // Ensure falling sound has played first
+        source.PlayOneShot(meteorImpact);
+    }
+
     private IEnumerator PlayImpactAfterFall()
     {
-        // Wait for the duration of the meteorFall clip.
+        // Wait for the meteorFall sound to complete
         yield return new WaitForSeconds(meteorFall.length);
 
-        // Play meteorImpact sound.
-        source.PlayOneShot(meteorImpact);
-
-        // Reset the flag to allow another meteorFall sound to trigger if needed.
-        isMeteorFallPlaying = false;
+        // Trigger the impact logic (you can replace this with an actual impact event if applicable)
+        Impact();
     }
 }
