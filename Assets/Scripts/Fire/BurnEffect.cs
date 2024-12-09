@@ -4,40 +4,29 @@ using UnityEngine;
 
 public class BurnEffect : MonoBehaviour
 {
-    public GameObject fireParticles;
-    public GameObject burnParticles;
+    [SerializeField] private ParticleSystem part;
+    [SerializeField] private List<ParticleCollisionEvent> collisionEvents;
+    [SerializeField] private float burnIncrement = 0.05f;
+    
 
-    public float burnDuration = 10;
-
-    void Update()
+    void Start()
     {
-       if (fireParticles != null)
-        {
-        Vector3 pos = GameObject.FindGameObjectWithTag("Fire").transform.position;
-        Ray ray = new Ray(pos, Vector3.down); // Cast downward
-        RaycastHit hit;
+        part = GetComponent<ParticleSystem>();
+        collisionEvents = new List<ParticleCollisionEvent>();
+    }
 
-        if (Physics.Raycast(ray, out hit, 1f)) // Adjust range as needed
+    void OnParticleCollision(GameObject other)
+    {
+        if (other.tag == "Burnable")
         {
-            if (hit.collider.CompareTag("Ground")) // Ensure it's the ground
+            if (TryGetComponent<Renderer>(out Renderer renderer))
             {
-                TriggerBurnEffect(hit.point);
+                if (renderer.material.HasFloat("_burnAmount")) 
+                {
+
+                    renderer.material.SetFloat("_burnAmount", renderer.material.GetFloat("_burnAmount") <= 1.0f ? renderer.material.GetFloat("_burnAmount") + burnIncrement : 1.0f);
+                }
             }
         }
-        } 
-    }
-
-    void TriggerBurnEffect(Vector3 position)
-    {
-        if (burnParticles != null)
-        {
-            // Instantiate the burn effect at the specified position
-            GameObject burnEffect = Instantiate(burnParticles, position, Quaternion.identity);
-
-            // Destroy the effect after a set duration
-            Destroy(burnEffect, burnDuration);
-        }
-    }
-
-    
+    }  
 }

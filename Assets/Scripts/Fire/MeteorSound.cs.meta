@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 79c0280379125e945b4113db361292d0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - source: {instanceID: 0}
+  - meteorFall: {instanceID: 0}
+  - meteorImpact: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

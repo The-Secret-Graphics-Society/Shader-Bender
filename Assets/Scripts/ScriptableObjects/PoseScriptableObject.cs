@@ -10,6 +10,7 @@ public class PoseScriptableObject : ScriptableObject
     private LinkedList<Vector3> chestPositions = new LinkedList<Vector3>();
     public Quaternion leftHandRotation;
     public Quaternion rightHandRotation;
+    public Quaternion jointHandRotation;
 
     // Hand states
     public bool isLeftFistClenched;
