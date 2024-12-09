@@ -3666,6 +3666,27 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: 6304187445235dc4da9e35da1e2f84e1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -4683669308469848369, guid: 6304187445235dc4da9e35da1e2f84e1,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -4683669308469848369, guid: 6304187445235dc4da9e35da1e2f84e1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -8067726398312463513, guid: 6304187445235dc4da9e35da1e2f84e1,
+        type: 3}
+    - target: {fileID: -4683669308469848369, guid: 6304187445235dc4da9e35da1e2f84e1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 576f7a545e2057d41bda04291fa60410, type: 2}
     - target: {fileID: -2883341244656780469, guid: 6304187445235dc4da9e35da1e2f84e1,
         type: 3}
       propertyPath: m_Intensity
