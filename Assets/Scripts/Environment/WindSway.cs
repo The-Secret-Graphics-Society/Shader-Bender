@@ -125,7 +125,7 @@ public class WindSway : MonoBehaviour
             aimwindForce = 0.22f;
             aimratio = 0.25f;
             aimdistanceMultiplier = 1.0f;
-            aimdirection = 6.17f;
+            //aimdirection = 6.17f;
             
         }
         if (objectType == oType.plant)
@@ -134,7 +134,7 @@ public class WindSway : MonoBehaviour
             aimwindForce = 1.0f;
             aimratio = 0.25f;
             aimdistanceMultiplier = 1.0f;
-            aimdirection = 6.17f;
+            //aimdirection = 6.17f;
         }
     }
 
@@ -146,17 +146,17 @@ public class WindSway : MonoBehaviour
         while (true)
         {
             
-            freq = Mathf.MoveTowards(freq, aimfreq, moveSpeed*10.0f * Time.deltaTime);
+            freq = Mathf.MoveTowards(freq, aimfreq, moveSpeed*25.0f * Time.deltaTime);
             windForce = Mathf.MoveTowards(windForce, aimwindForce, moveSpeed * Time.deltaTime);
             ratio = Mathf.MoveTowards(ratio, aimratio, moveSpeed * Time.deltaTime);
             distanceMultiplier = Mathf.MoveTowards(distanceMultiplier, aimdistanceMultiplier, moveSpeed * Time.deltaTime);
-            direction = Mathf.MoveTowards(direction, aimdirection, moveSpeed*10.0f * Time.deltaTime);
+            //direction = Mathf.MoveTowards(direction, aimdirection, moveSpeed*10.0f * Time.deltaTime);
             
             if (Mathf.Abs(freq - aimfreq) < threshold &&
                 Mathf.Abs(windForce - aimwindForce) < threshold &&
                 Mathf.Abs(ratio - aimratio) < threshold &&
-                Mathf.Abs(distanceMultiplier - aimdistanceMultiplier) < threshold &&
-                Mathf.Abs(direction - aimdirection) < threshold)
+                Mathf.Abs(distanceMultiplier - aimdistanceMultiplier) < threshold) // &&
+                //Mathf.Abs(direction - aimdirection) < threshold)
             {
                 break; 
             }
@@ -167,7 +167,7 @@ public class WindSway : MonoBehaviour
 
     private void setLow()
     {
-        aimdirection = _startDirection;
+        //aimdirection = _startDirection;
         aimfreq = _startFreq;
         aimwindForce = _startWindForce;
         aimratio = _startRatio;
