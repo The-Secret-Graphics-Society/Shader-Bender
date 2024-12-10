@@ -118,6 +118,7 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _DarkeningFactor: 0.595
     - _Darkness: 0.9
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -132,11 +133,13 @@ Material:
     - _EnvironmentReflections: 1
     - _EnvironmentalReflections: 0
     - _FresnelActive: 1
+    - _FresnelEdgeScale: 2
     - _FresnelPower: 5
-    - _FresnelStrength: 0.5
+    - _FresnelStrength: 0.175
     - _GlossMapScale: 0
     - _GlossSource: 1
     - _Glossiness: 0
+    - _GlossinessCutoff: 0.7
     - _GlossyReflections: 0
     - _Metallic: 0
     - _MetallicSpecGlossMapToggle: 0
@@ -150,7 +153,7 @@ Material:
     - _QueueOffset: 0
     - _Range: 3
     - _ReceiveShadows: 1
-    - _Smoothness: 0
+    - _Smoothness: 0.225
     - _SmoothnessSource: 0
     - _SmoothnessTextureChannel: 0
     - _SpecGlossMapToggle: 0
@@ -171,5 +174,5 @@ Material:
     - _PointA: {r: 0, g: 0, b: 0, a: 1}
     - _PointB: {r: 0, g: 0, b: 0, a: 1}
     - _RightHandPos: {r: 0.18481852, g: 0.1681295, b: 0.20305827, a: 0}
-    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecColor: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 1}
   m_BuildTextureStacks: []
