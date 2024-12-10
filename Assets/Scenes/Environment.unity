@@ -2673,6 +2673,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6081367803917297227, guid: 00b0b18b69259d44ba7c2ef6b1919db4,
         type: 3}
+    - target: {fileID: 4915331215418592707, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: fireParticles
+      value: 
+      objectReference: {fileID: 1551301323}
+    - target: {fileID: 5486501665758529668, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: fireParticles
+      value: 
+      objectReference: {fileID: 1551301322}
     - target: {fileID: 6199130699211428689, guid: de9734e3220f18846b591acb40d21f2d,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -2767,8 +2777,50 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7653597230552340992, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1551301324}
   m_SourcePrefab: {fileID: 100100000, guid: de9734e3220f18846b591acb40d21f2d, type: 3}
+--- !u!1 &1551301320 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7653597230552340992, guid: de9734e3220f18846b591acb40d21f2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1551301319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &1551301321 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8024218118551400223, guid: de9734e3220f18846b591acb40d21f2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1551301319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &1551301322 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8885219830897690105, guid: de9734e3220f18846b591acb40d21f2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1551301319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &1551301323 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8312413307380400318, guid: de9734e3220f18846b591acb40d21f2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1551301319}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1551301324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551301320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a54a1b8cea806a4590e303353acb0f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireParticles: {fileID: 1551301321}
+  burnIncrement: 0.05
 --- !u!1 &1558525499
 GameObject:
   m_ObjectHideFlags: 0
