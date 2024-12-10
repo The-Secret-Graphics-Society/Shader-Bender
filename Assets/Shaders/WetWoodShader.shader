@@ -18,13 +18,17 @@ Shader "Custom/WetWoodShader"
 		[Toggle(_SPECGLOSSMAP)] _SpecGlossMapToggle ("Use Specular Gloss Map", Float) = 0.0
 		_SpecColor("Specular Color", Color) = (0.5, 0.5, 0.5, 0.5)
 		_SpecGlossMap("Specular Map", 2D) = "white" {}
-		[Toggle(_GLOSSINESS_FROM_BASE_ALPHA)] _GlossSource ("Glossiness Source, from Albedo Alpha (if on) vs from Specular (if off)", Float) = 0
+		[Toggle(_GLOSSINESS_FROM_BASE_ALPHA)] _GlossSource ("Glossiness Source, from Albedo Alpha (if on) vs from Specular (if off)", Float) = 1
 		_Smoothness("Smoothness", Range(0.0, 1.0)) = 0.0
         
 		[Header(Wet Floor Properties)]
-        _Darkness("Darkness Amount", Range(0, 1)) = 0.5
-        _Range("Darkening Range", Float) = 5.0
         _WetnessMap("Wetness Map", 2D) = "black" {}
+		_DarkeningFactor("Floor Darkening Factor", Range(0,1)) = 0.7
+        _GlossinessCutoff("Glossiness Cutoff", Range(0,1)) = 0.7
+        _FresnelEdgeScale("Fresnel Edge Mask Scale", Float) = 5.0
+        _FresnelPower("Fresnel Power", Float) = 5.0
+        _FresnelStrength("Fresnel Strength", Range(0,1)) = 0.5
+        [Toggle] _FresnelActive("Fresnel Active", Float) = 0.0
 	}
 
 	SubShader
@@ -134,20 +138,21 @@ Shader "Custom/WetWoodShader"
 					float4 shadowCoord 				: TEXCOORD7;
 				#endif
 
+                float4 screenPos 					: TEXCOORD8;
 				float4 color						: COLOR;
-				//UNITY_VERTEX_INPUT_INSTANCE_ID
-				//UNITY_VERTEX_OUTPUT_STEREO
 			};
 
 			// Textures, Samplers & Global Properties
 			// (note, BaseMap, BumpMap and EmissionMap is being defined by the SurfaceInput.hlsl include)
 			TEXTURE2D(_SpecGlossMap); SAMPLER(sampler_SpecGlossMap);
+            TEXTURE2D(_CameraOpaqueTexture); SAMPLER(sampler_CameraOpaqueTexture);
             TEXTURE2D(_WetnessMap); SAMPLER(sampler_WetnessMap);
-            float4 _LeftHandPos;
-            float4 _RightHandPos;
-            float _Darkness;
-            float _Range;
-			float _WaterActive;
+			float _DarkeningFactor;
+			float _GlossinessCutoff;
+			float _FresnelEdgeScale;
+            float _FresnelPower;
+            float _FresnelStrength;
+			float _FresnelActive;
 
 			// Functions
 			half4 SampleSpecularSmoothness(float2 uv, half alpha, half4 specColor, TEXTURE2D_PARAM(specMap, sampler_specMap))
@@ -291,6 +296,7 @@ Shader "Custom/WetWoodShader"
 				#endif
 
 				OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
+                OUT.screenPos = ComputeScreenPos(OUT.positionCS);
 				OUT.color = IN.color;
 				return OUT;
 			}
@@ -298,12 +304,49 @@ Shader "Custom/WetWoodShader"
 			// Fragment Shader
 			half4 LitPassFragment(Varyings IN) : SV_Target
             {
-				//UNITY_SETUP_INSTANCE_ID(IN);
-				//UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
+                float currentWetness = SAMPLE_TEXTURE2D(_WetnessMap, sampler_WetnessMap, IN.uv).r;
+                float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+                float4 sceneColor = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, screenUV);
+				float albedoAlpha = 0;
+
+				if (currentWetness > _GlossinessCutoff) {
+					albedoAlpha = saturate(currentWetness - 0.5);
+				}
+				else if (currentWetness > 0) {
+					albedoAlpha = currentWetness * (currentWetness - 0.5);
+					_Smoothness = saturate(_Smoothness + (_GlossinessCutoff - currentWetness) * (1 - _Smoothness));
+				}
 
 				// Setup SurfaceData
 				SurfaceData surfaceData;
 				InitalizeSurfaceData(IN, surfaceData);
+				surfaceData.albedo = float4(sceneColor.xyz * (1.0 - currentWetness * _DarkeningFactor), albedoAlpha);
+                surfaceData.alpha = currentWetness;
+				
+                float fresnel = 0;
+				if (_FresnelActive > 0 && currentWetness > 0) {
+					// Treat the wetness as a height map to derive normals
+					float2 offset = float2(0.001, 0.001);
+					float wet_x = SAMPLE_TEXTURE2D(_WetnessMap, sampler_WetnessMap, IN.uv + float2(offset.x, 0)).r;
+					float wet_y = SAMPLE_TEXTURE2D(_WetnessMap, sampler_WetnessMap, IN.uv + float2(0, offset.y)).r;
+					float dfdx = wet_x - currentWetness;
+					float dfdy = wet_y - currentWetness;
+					float3 wetNormalTS = normalize(float3(-dfdx, -dfdy, 1.0));
+					surfaceData.normalTS = normalize(lerp(surfaceData.normalTS, wetNormalTS, currentWetness));
+
+					// Fresnel for edge reflections
+					fresnel = pow(1.0 - saturate(dot(normalize(surfaceData.normalTS), normalize(GetCameraPositionWS() - IN.positionWS))), _FresnelPower);
+
+					// Use the wetness mask as an outline for the fresnel
+					dfdx = ddx(currentWetness);
+					dfdy = ddy(currentWetness);
+					float edgeMask = abs(dfdx) + abs(dfdy);
+					edgeMask = saturate(edgeMask * _FresnelEdgeScale);
+
+					fresnel *= _FresnelStrength * currentWetness * edgeMask;
+				}
+
+                surfaceData.emission = fresnel;
 
 				// Setup InputData
 				InputData inputData;
@@ -313,127 +356,9 @@ Shader "Custom/WetWoodShader"
 				half4 color = UniversalFragmentBlinnPhong(inputData, surfaceData);
 
 				color.rgb = MixFog(color.rgb, inputData.fogCoord);
-				//color.a = OutputAlpha(color.a, _Surface);
-				//return color;
-				
-				// Initialise darken factor
-				float darkenFactor = 1.0;
-                float currentWetness = SAMPLE_TEXTURE2D(_WetnessMap, sampler_WetnessMap, IN.uv).r;
-
-                // Base colour
-                half3 baseColor = half3(0, 0, 0);
-                return half4(baseColor, currentWetness * 0.5);
-
+                return half4(color.rgb, currentWetness);
 			}
 			ENDHLSL
 		}
-
-		Pass
-        {
-			Name "ShadowCaster"
-			Tags { "LightMode"="ShadowCaster" }
-
-			ZWrite On
-			ZTest LEqual
-
-			HLSLPROGRAM
-			#pragma vertex ShadowPassVertex
-			#pragma fragment ShadowPassFragment
-
-			// Material Keywords
-			#pragma shader_feature_local_fragment _ALPHATEST_ON
-			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-			// GPU Instancing
-			#pragma multi_compile_instancing
-			//#pragma multi_compile _ DOTS_INSTANCING_ON
-
-			// Universal Pipeline Keywords
-			// (v11+) This is used during shadow map generation to differentiate between directional and punctual (point/spot) light shadows, as they use different formulas to apply Normal Bias
-			#pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
-
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-
-			ENDHLSL
-		}
-
-		// DepthOnly, used for Camera Depth Texture (if cannot copy depth buffer instead, and the DepthNormals below isn't used)
-		Pass
-        {
-			Name "DepthOnly"
-			Tags { "LightMode"="DepthOnly" }
-
-			ColorMask 0
-			ZWrite On
-			ZTest LEqual
-
-			HLSLPROGRAM
-			#pragma vertex DepthOnlyVertex
-			#pragma fragment DepthOnlyFragment
-
-			// Material Keywords
-			#pragma shader_feature_local_fragment _ALPHATEST_ON
-			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-			// GPU Instancing
-			#pragma multi_compile_instancing
-			//#pragma multi_compile _ DOTS_INSTANCING_ON
-
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
-
-			// Note if we do any vertex displacement, we'll need to change the vertex function. e.g. :
-			/*
-			#pragma vertex DisplacedDepthOnlyVertex (instead of DepthOnlyVertex above)
-			
-			Varyings DisplacedDepthOnlyVertex(Attributes input) {
-				Varyings output = (Varyings)0;
-				UNITY_SETUP_INSTANCE_ID(input);
-				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-				
-				// Example Displacement
-				input.positionOS += float4(0, _SinTime.y, 0, 0);
-				
-				output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
-				output.positionCS = TransformObjectToHClip(input.position.xyz);
-				return output;
-			}
-			*/
-			
-			ENDHLSL
-		}
-
-		// DepthNormals, used for SSAO & other custom renderer features that request it
-		Pass
-        {
-			Name "DepthNormals"
-			Tags { "LightMode"="DepthNormals" }
-
-			ZWrite On
-			ZTest LEqual
-
-			HLSLPROGRAM
-			#pragma vertex DepthNormalsVertex
-			#pragma fragment DepthNormalsFragment
-
-			// Material Keywords
-			#pragma shader_feature_local _NORMALMAP
-			#pragma shader_feature_local_fragment _ALPHATEST_ON
-			#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-			// GPU Instancing
-			#pragma multi_compile_instancing
-			//#pragma multi_compile _ DOTS_INSTANCING_ON
-
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
-			
-			ENDHLSL
-		}
-
 	}
 }

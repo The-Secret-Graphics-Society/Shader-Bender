@@ -6,9 +6,10 @@ Shader "Custom/UpdateWetnessMap"
         _LeftHandPos("Left Hand Position", Vector) = (0, 0, 0)
         _RightHandPos("Right Hand Position", Vector) = (0, 0, 0)
         [Toggle] _WaterActive("Water Active", Float) = 0.0
-        _Darkness("Darkness Amount", Range(0, 1)) = 0.1
-        _Range("Wetness Range", Float) = 1.0
+        _Darkness("Darkness Amount", Range(0, 1)) = 0.05
+        _Range("Wetness Range", Float) = 0.5
         _FadeSpeed("Fade Speed", Float) = 0.2
+        _NoiseScale("Noise Scale", Float) = 50.0
 
         _WorldOrigin("World Origin", Vector) = (0,0,0)
         _WorldScale("World Scale", Vector) = (1,1,1)
@@ -27,7 +28,8 @@ Shader "Custom/UpdateWetnessMap"
 
             CGPROGRAM
             #include "UnityCustomRenderTexture.cginc"
-            #include "UnityCG.cginc"            
+            #include "UnityCG.cginc"
+            #include "Includes/PerlinNoise2D.cginc"
             #pragma vertex CustomRenderTextureVertexShader
             #pragma fragment frag
             #pragma target 3.0
@@ -39,6 +41,7 @@ Shader "Custom/UpdateWetnessMap"
             float _Darkness;
             float _Range;
             float _FadeSpeed;
+            float _NoiseScale;
             float3 _WorldOrigin;
             float4 _WorldScale;
             float _WorldRotationY;
@@ -49,13 +52,9 @@ Shader "Custom/UpdateWetnessMap"
                 float wetnessFactor = tex2D(_WetnessMap, uv).r;
 
                 // Estimate the world position
-                float localX = (uv.x - 0.5) * _WorldScale.x;
-                float localZ = (uv.y - 0.5) * _WorldScale.z;
-                float c = cos(_WorldRotationY);
-                float s = sin(_WorldRotationY);
-                float rotatedX = localX * c - localZ * s;
-                float rotatedZ = localX * s + localZ * c;
-                float3 positionWS = float3(_WorldOrigin.x + rotatedX, _WorldOrigin.y, _WorldOrigin.z + rotatedZ);
+                float localX = -(uv.x - 0.5) * _WorldScale.x;
+                float localZ = -(uv.y - 0.5) * _WorldScale.z;
+                float3 positionWS = float3(_WorldOrigin.x + localX, _WorldOrigin.y, _WorldOrigin.z + localZ);
                 
                 float dt = unity_DeltaTime.x;
                 wetnessFactor = max(wetnessFactor - _FadeSpeed * dt, 0.0);
@@ -71,7 +70,11 @@ Shader "Custom/UpdateWetnessMap"
                     float proximityFactorA = (1.0 - saturate(distA / _Range)) * _Darkness;
                     float proximityFactorB = (1.0 - saturate(distB / _Range)) * _Darkness;
                     float newWetness = max(proximityFactorA, proximityFactorB);
-                    wetnessFactor = wetnessFactor + newWetness;
+
+                    float edgeFactor = (1.0 - saturate(min(distA, distB) / _Range)) * 0.5;
+                    float splatterWetness = lerp(newWetness * cloudNoise(uv * _NoiseScale), newWetness, edgeFactor);
+
+                    wetnessFactor += splatterWetness;
                 }
 
                 wetnessFactor = clamp(wetnessFactor, 0, 1);

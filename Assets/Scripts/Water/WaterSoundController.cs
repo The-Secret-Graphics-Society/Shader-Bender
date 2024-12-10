@@ -32,7 +32,7 @@ public class WaterSoundController : MonoBehaviour
         oneShotAudioSource.playOnAwake = false;
         oneShotAudioSource.loop = false;
         oneShotAudioSource.spatialBlend = 0f;
-        oneShotAudioSource.volume = 0.8f;
+        oneShotAudioSource.volume = 0.4f;
 
         dripAudioSource = gameObject.AddComponent<AudioSource>();
         dripAudioSource.loop = true;

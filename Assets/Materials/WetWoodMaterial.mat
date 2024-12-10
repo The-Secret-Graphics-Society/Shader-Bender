@@ -25,8 +25,11 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _EMISSION
+  - _GLOSSINESS_FROM_BASE_ALPHA
   - _NORMALMAP
   m_InvalidKeywords:
+  - _FRESNELACTIVE_ON
   - _SPECULARHIGHLIGHTS_OFF
   - _WATERACTIVE_ON
   m_LightmapFlags: 4
@@ -125,12 +128,14 @@ Material:
     - _DistortionScale: 10
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission: 0
+    - _Emission: 1
     - _EnvironmentReflections: 1
     - _EnvironmentalReflections: 0
+    - _FresnelActive: 1
     - _FresnelPower: 5
+    - _FresnelStrength: 0.5
     - _GlossMapScale: 0
-    - _GlossSource: 0
+    - _GlossSource: 1
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
@@ -155,11 +160,11 @@ Material:
     - _Surface: 0
     - _VertexDisplacement: 1
     - _VertexNoiseScale: 5
-    - _WaterActive: 1
+    - _WaterActive: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
+    - _BaseColor: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 0}
     - _Color: {r: 0.764151, g: 0.40730688, b: 0.40730688, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LeftHandPos: {r: 0.043218117, g: 0.056562483, b: -0.16603014, a: 0}
