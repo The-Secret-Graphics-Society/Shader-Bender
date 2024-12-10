@@ -8,17 +8,11 @@ public class FireHand : MonoBehaviour
     [SerializeField] private PoseScriptableObject _poseScriptableObject;
     [SerializeField] private ParticleSystem rightHandFire;
     [SerializeField] private ParticleSystem leftHandFire;
+    [SerializeField] private ParticleSystem flameThrower;
     [SerializeField, Tooltip("If we should play the fire in both hands")]
     private bool fireInBothHands = true;
     private bool isFireActive = false;
     private bool wasRightHandRaised = false;
-
-
-    void Start()
-    {
-        // Do nothing :)
-
-    }
 
     private void OnEnable()
     {
@@ -44,11 +38,17 @@ public class FireHand : MonoBehaviour
             leftHandFire.gameObject.transform.position = _poseScriptableObject.GetCurrentRightHandPosition();
             leftHandFire.gameObject.transform.rotation = _poseScriptableObject.rightHandRotation;
         }
+        if (flameThrower != null)
+        {
+            flameThrower.gameObject.transform.position = (_poseScriptableObject.GetCurrentLeftHandPosition() 
+            + _poseScriptableObject.GetCurrentLeftHandPosition()) / 2;
+            flameThrower.gameObject.transform.rotation = _poseScriptableObject.jointHandRotation;
+        }
 
         bool isRightHandCurrentlyRaised = _poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder;
         bool areBothHandsRaised = _poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder;
-
-        
+        bool areHandsClose = _poseScriptableObject.closeHands;
+        bool areArmsExtended = _poseScriptableObject.leftArmExtended && _poseScriptableObject.rightArmExtended;
 
         if (isRightHandCurrentlyRaised && !wasRightHandRaised)
         {
@@ -65,6 +65,18 @@ public class FireHand : MonoBehaviour
         }
 
         wasRightHandRaised = isRightHandCurrentlyRaised;
+
+        if (areHandsClose && areArmsExtended)
+        {
+            if (isFireActive)
+            {
+                EnableFire(flameThrower);;
+            }
+        }
+        else
+        {
+            DisableFire(flameThrower);
+        }
     }
 
     void EnableFires()
@@ -79,6 +91,10 @@ public class FireHand : MonoBehaviour
             leftHandFire.Play();
             isFireActive = true;
         }
+        if (flameThrower != null)
+        {
+            flameThrower.Play();
+        }
     }
     void DisableFires()
     {
@@ -91,6 +107,10 @@ public class FireHand : MonoBehaviour
         {
             leftHandFire.Stop();
             isFireActive = false;
+        }
+        if (flameThrower != null)
+        {
+            flameThrower.Stop();
         }
     }
 

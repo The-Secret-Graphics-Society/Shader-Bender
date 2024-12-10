@@ -77,8 +77,20 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_7fb7313cd0784fcaa3e6e7a0a826077f_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 01ac3ff28c2f8409d8a58ff8d259a013, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_18229f41a0354659b10de8214129f63b_Out_0_Texture2D:
+        m_Texture: {fileID: 2800000, guid: fff2d6c156c68c34e81b979cc3bc6331, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_4f4707f86c2542d49db2dcec18a037de_Out_0_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 4731ca725fb64954f8b188ea765cb926, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -116,6 +128,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0
@@ -127,6 +140,13 @@ Material:
     - _UVSec: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
+    - _burnAmount: 0
+    - _colourStrength: 2
+    - _dissolveAmount: 0
+    - _distortionAmount: 1
+    - _flameJiggle: 0.06
+    - _heatWave: 0.02
+    - _noiseSpeed: 0.2
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
