@@ -57,6 +57,9 @@ Shader "David/Participating_Media/AoEWindAesthetic"
             TEXTURE2D(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
 
+            TEXTURE2D(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
+
             Light light;
             float transmittance;
             float extinction; // absorption + scattering
@@ -108,14 +111,14 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                 vp_xform.y =  vp.y;
                 vp_xform.z = -sin(theta) * vp.x + cos(theta) * vp.z;
                 
-                float f = _Frequency;
+                float f = _Frequency; //+ sin(_Time * 0.1);
                 // float densityValue = (noise(    0.1 * vp_xform.x * f,
                 //                                 vp_xform.y * f, 
                 //                                 0.5 * vp_xform.z * f) + 1.0) * 0.5;
 
                 float densityValueScaled = _SmokeScale * (noise(     
                     _SampleXYZOffSet.x * _SmokeScale * vp_xform.x + f,
-                    _SampleXYZOffSet.y * _SmokeScale * vp_xform.y, 
+                    _SampleXYZOffSet.y * _SmokeScale * abs(vp_xform.y), 
                     _SampleXYZOffSet.z * _SmokeScale * vp_xform.z + f));
                                               
                 float densityValue = clamp(densityValueScaled, 0.0, 1.0);
@@ -130,13 +133,16 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                 v2f o;
                 o.vertex = TransformObjectToHClip(v.vertex.xyz);
                 o.positionWS = mul(UNITY_MATRIX_M, v.vertex).xyz;
-                o.uv = v.uv;
+                o.uv = ComputeScreenPos(float4(o.positionWS.xyz, 1.0));
 
                 return o;
             }
 
             float4 frag (v2f i) : SV_Target
             {
+                float2 screenUV = i.uv.xy;
+                float4 sceneColor = float4(0.0, 0.0, 0.0, 0.0);//= SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, screenUV);
+
                 // Sample the depth texture
                 float depthBufferValue = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv).r;
 
@@ -242,10 +248,23 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                 {
                     discard;
                 }
-                volumeColor.xyz *= _BaseColor.xyz;
+                
                 float4 visibility = float4(0,0,0,0);
                 volumeColor.a = volumeColor.a * _Visibility + (1 - _Visibility) * visibility.a;
                 //volumeColor.a = _Visibility;
+
+                
+                
+                sceneColor = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, 0.2 * screenUV);
+                sceneColor += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, -0.2 * screenUV);
+                //sceneColor += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, -0.5 * screenUV);
+                //sceneColor += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, 0.2 * screenUV);
+                //sceneColor += SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, -0.2 * screenUV);
+                sceneColor /= 2;
+                //sceneColor *= 0.1; // reducing the intensity
+                //return sceneColor;
+                volumeColor.xyz *= sceneColor.xyz + _BaseColor.xyz;
+                //volumeColor.xyz *= (_BaseColor.xyz);
                 return volumeColor;
 
             }
