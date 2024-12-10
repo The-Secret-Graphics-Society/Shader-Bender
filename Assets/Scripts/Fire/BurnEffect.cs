@@ -4,40 +4,36 @@ using UnityEngine;
 
 public class BurnEffect : MonoBehaviour
 {
-    public GameObject fireParticles;
-    public GameObject burnParticles;
+    [SerializeField] private ParticleSystem fireParticles;
+    [SerializeField] private List<ParticleCollisionEvent> collisionEvents;
+    [SerializeField] private float burnIncrement = 0.05f;
+    
 
-    public float burnDuration = 10;
-
-    void Update()
+    void Start()
     {
-       if (fireParticles != null)
-        {
-        Vector3 pos = GameObject.FindGameObjectWithTag("Fire").transform.position;
-        Ray ray = new Ray(pos, Vector3.down); // Cast downward
-        RaycastHit hit;
+        fireParticles = GetComponent<ParticleSystem>();
+        collisionEvents = new List<ParticleCollisionEvent>();
+    }
 
-        if (Physics.Raycast(ray, out hit, 1f)) // Adjust range as needed
+    void OnParticleCollision(GameObject other)
+    {
+        if (other.tag == "Burnable")
         {
-            if (hit.collider.CompareTag("Ground")) // Ensure it's the ground
+            if (other.TryGetComponent<Renderer>(out Renderer renderer))
             {
-                TriggerBurnEffect(hit.point);
+                if (renderer.materials[1].HasFloat("_burnAmount")) 
+                {
+                    Debug.Log("hit");
+                    if (renderer.materials[1].GetFloat("_burnAmount") <= 1.0f)
+                    {
+                        renderer.materials[1].SetFloat("_burnAmount", renderer.materials[1].GetFloat("_burnAmount") + renderer.material.GetFloat("_burnAmount") + burnIncrement);
+                    }
+                    else
+                    {
+                        renderer.materials[1].SetFloat("_burnAmount", 1.0f);
+                    }
+                }
             }
         }
-        } 
-    }
-
-    void TriggerBurnEffect(Vector3 position)
-    {
-        if (burnParticles != null)
-        {
-            // Instantiate the burn effect at the specified position
-            GameObject burnEffect = Instantiate(burnParticles, position, Quaternion.identity);
-
-            // Destroy the effect after a set duration
-            Destroy(burnEffect, burnDuration);
-        }
-    }
-
-    
+    }  
 }

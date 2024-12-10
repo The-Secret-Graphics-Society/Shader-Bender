@@ -8,17 +8,11 @@ public class FireHand : MonoBehaviour
     [SerializeField] private PoseScriptableObject _poseScriptableObject;
     [SerializeField] private ParticleSystem rightHandFire;
     [SerializeField] private ParticleSystem leftHandFire;
+    [SerializeField] private ParticleSystem flameThrower;
     [SerializeField, Tooltip("If we should play the fire in both hands")]
     private bool fireInBothHands = true;
-    private bool isFireActive = false;
+    [SerializeField] private bool isFireActive = false;
     private bool wasRightHandRaised = false;
-
-
-    void Start()
-    {
-        // Do nothing :)
-
-    }
 
     private void OnEnable()
     {
@@ -44,27 +38,47 @@ public class FireHand : MonoBehaviour
             leftHandFire.gameObject.transform.position = _poseScriptableObject.GetCurrentRightHandPosition();
             leftHandFire.gameObject.transform.rotation = _poseScriptableObject.rightHandRotation;
         }
+        if (flameThrower != null)
+        {
+            flameThrower.gameObject.transform.position = (_poseScriptableObject.GetCurrentLeftHandPosition() 
+            + _poseScriptableObject.GetCurrentLeftHandPosition()) / 2;
+            flameThrower.gameObject.transform.rotation = _poseScriptableObject.jointHandRotation;
+        }
 
         bool isRightHandCurrentlyRaised = _poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder;
         bool areBothHandsRaised = _poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder;
+        bool areHandsClose = _poseScriptableObject.closeHands;
+        bool areArmsExtended = _poseScriptableObject.leftArmExtended && _poseScriptableObject.rightArmExtended;
 
-        
+        //if (isRightHandCurrentlyRaised && !wasRightHandRaised)
+        //{
+        //    if (isFireActive)
+        //    {
+        //        DisableFire(rightHandFire);
+        //        if (fireInBothHands) DisableFire(leftHandFire);
+        //    }
+        //    else
+        //    {
+        //        EnableFire(rightHandFire);
+        //        if (fireInBothHands) EnableFire(leftHandFire);
+        //    }
+        //}
 
-        if (isRightHandCurrentlyRaised && !wasRightHandRaised)
+        wasRightHandRaised = isRightHandCurrentlyRaised;
+
+        if (areHandsClose)
         {
             if (isFireActive)
             {
-                DisableFire(rightHandFire);
-                if (fireInBothHands) DisableFire(leftHandFire);
-            }
-            else
-            {
-                EnableFire(rightHandFire);
-                if (fireInBothHands) EnableFire(leftHandFire);
+                Debug.Log("flamethrowering");
+                EnableFire(flameThrower);
+
             }
         }
-
-        wasRightHandRaised = isRightHandCurrentlyRaised;
+        else
+        {
+            DisableFire(flameThrower);
+        }
     }
 
     void EnableFires()
@@ -72,12 +86,17 @@ public class FireHand : MonoBehaviour
         if (rightHandFire != null)
         {
             rightHandFire.Play();
+            Debug.Log("isfireactive");
             isFireActive = true;
         }
         if (leftHandFire != null)
         {
             leftHandFire.Play();
             isFireActive = true;
+        }
+        if (flameThrower != null)
+        {
+            flameThrower.Play();
         }
     }
     void DisableFires()
@@ -92,6 +111,10 @@ public class FireHand : MonoBehaviour
             leftHandFire.Stop();
             isFireActive = false;
         }
+        if (flameThrower != null)
+        {
+            flameThrower.Stop();
+        }
     }
 
     void EnableFire(ParticleSystem particleSystem)
@@ -99,7 +122,6 @@ public class FireHand : MonoBehaviour
         if (particleSystem != null)
         {
             particleSystem.Play();
-            isFireActive = true;
         }
     }
 
@@ -108,7 +130,6 @@ public class FireHand : MonoBehaviour
         if (particleSystem != null)
         {
             particleSystem.Stop();
-            isFireActive = false;
         }
     }
 }

@@ -12,6 +12,7 @@ public class PoseScriptableObject : ScriptableObject
     public Quaternion rightHandRotation;
     public float leftHandSpeed = 0f;
     public float rightHandSpeed = 0f;
+    public Quaternion jointHandRotation;
 
     // Hand states
     public bool isLeftFistClenched;
