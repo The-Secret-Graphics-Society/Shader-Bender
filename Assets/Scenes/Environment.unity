@@ -3582,6 +3582,16 @@ PrefabInstance:
       propertyPath: fireParticles
       value: 
       objectReference: {fileID: 1551301322}
+    - target: {fileID: 5707266876372898296, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: meteorFall
+      value: 
+      objectReference: {fileID: 8300000, guid: a299c18f94ac39249a7b7617aa602369, type: 3}
+    - target: {fileID: 5707266876372898296, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: meteorImpact
+      value: 
+      objectReference: {fileID: 8300000, guid: ae60125c3454f4142b890197631c31c0, type: 3}
     - target: {fileID: 5711058955032784009, guid: de9734e3220f18846b591acb40d21f2d,
         type: 3}
       propertyPath: poseScriptableObject
@@ -3620,6 +3630,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6382584223196779084, guid: de9734e3220f18846b591acb40d21f2d,
         type: 3}
+      propertyPath: meteorSound
+      value: 
+      objectReference: {fileID: 1823971823}
+    - target: {fileID: 6382584223196779084, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
       propertyPath: meteorPrefab
       value: 
       objectReference: {fileID: 4765969952225515900, guid: 113f8a0953c0823448e9b153bdbbb18d,
@@ -3653,6 +3668,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7759173819337882239, guid: de9734e3220f18846b591acb40d21f2d,
+        type: 3}
+      propertyPath: m_Volume
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 7759173819337882239, guid: de9734e3220f18846b591acb40d21f2d,
         type: 3}
@@ -4480,6 +4500,18 @@ MonoBehaviour:
     type: 2}
   webcamImage: {fileID: 0}
   disableWebcamImage: 1
+--- !u!114 &1823971823 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5707266876372898296, guid: de9734e3220f18846b591acb40d21f2d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1551301319}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c0280379125e945b4113db361292d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1912450868
 GameObject:
   m_ObjectHideFlags: 0
