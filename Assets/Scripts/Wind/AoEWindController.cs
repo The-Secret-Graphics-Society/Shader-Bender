@@ -21,9 +21,9 @@ public class AoEWindController : MonoBehaviour
     [SerializeField] private float _effectDuration = 5;
     [SerializeField] private bool _effectActive = false;
 
-    public delegate void AoEWindControllerDelegate();
+    private delegate void AoEWindControllerDelegate();
 
-    public static event AoEWindControllerDelegate OnAoEActivated;
+    private event AoEWindControllerDelegate OnAoEActivated;
 
     #endregion AoE Mechanics
 
