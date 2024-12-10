@@ -10,7 +10,9 @@ public class MeteorSpawner : MonoBehaviour
     public Transform endPosition;
     private bool interaction;
     private bool rightHandRaised;
+    public bool canSpawnMeteor = true;
     //public int meteorCount = 1;
+    public MeteorSound meteorSound;
 
     void Start()
     {
@@ -33,8 +35,11 @@ public class MeteorSpawner : MonoBehaviour
         // When the interaction criteria is met, we spawn in the fireEruption
         if (interaction)
         {
-            MeteorShower();
-            interaction = false;
+            if(canSpawnMeteor)
+            {
+                MeteorShower();
+            }
+        interaction = false;
         }
     }
 
@@ -42,6 +47,17 @@ public class MeteorSpawner : MonoBehaviour
     {
         var startPos = startPosition.position;
         GameObject objVFX = Instantiate(meteorPrefab, startPos, Quaternion.identity) as GameObject;
+        
+        if (objVFX != null)
+        {
+            meteorSound.StartFalling();
+        }
+
+        if (objVFX.TryGetComponent<MeteorMovement>(out MeteorMovement meteorMovement))
+            {
+                meteorMovement.meteorSpawner = this;
+                canSpawnMeteor = false;
+            }
         var endPos = endPosition.position;
         Rotation(objVFX, endPos);
     }

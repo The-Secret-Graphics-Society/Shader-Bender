@@ -8,6 +8,7 @@ public class MeteorMovement : MonoBehaviour
     public GameObject impactPrefab;
     private Rigidbody rb;
     public List<GameObject> trails;
+    public MeteorSpawner meteorSpawner;
 
     // Start is called before the first frame update
     void Start()
@@ -26,11 +27,20 @@ public class MeteorMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (meteorSpawner != null)
+        {
+            meteorSpawner.canSpawnMeteor = true;
+        }
         speed = 0;
 
         ContactPoint contact = collision.contacts[0];
         Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
         Vector3 pos = contact.point;
+
+        if (collision.gameObject.TryGetComponent<MeteorSound>(out MeteorSound meteorSound))
+        {
+            meteorSound.Impact();
+        }
 
         if(impactPrefab != null)
         {
