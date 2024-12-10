@@ -11,7 +11,7 @@ public class FireHand : MonoBehaviour
     [SerializeField] private ParticleSystem flameThrower;
     [SerializeField, Tooltip("If we should play the fire in both hands")]
     private bool fireInBothHands = true;
-    private bool isFireActive = false;
+    [SerializeField] private bool isFireActive = false;
     private bool wasRightHandRaised = false;
 
     private void OnEnable()
@@ -50,27 +50,29 @@ public class FireHand : MonoBehaviour
         bool areHandsClose = _poseScriptableObject.closeHands;
         bool areArmsExtended = _poseScriptableObject.leftArmExtended && _poseScriptableObject.rightArmExtended;
 
-        if (isRightHandCurrentlyRaised && !wasRightHandRaised)
-        {
-            if (isFireActive)
-            {
-                DisableFire(rightHandFire);
-                if (fireInBothHands) DisableFire(leftHandFire);
-            }
-            else
-            {
-                EnableFire(rightHandFire);
-                if (fireInBothHands) EnableFire(leftHandFire);
-            }
-        }
+        //if (isRightHandCurrentlyRaised && !wasRightHandRaised)
+        //{
+        //    if (isFireActive)
+        //    {
+        //        DisableFire(rightHandFire);
+        //        if (fireInBothHands) DisableFire(leftHandFire);
+        //    }
+        //    else
+        //    {
+        //        EnableFire(rightHandFire);
+        //        if (fireInBothHands) EnableFire(leftHandFire);
+        //    }
+        //}
 
         wasRightHandRaised = isRightHandCurrentlyRaised;
 
-        if (areHandsClose && areArmsExtended)
+        if (areHandsClose)
         {
             if (isFireActive)
             {
-                EnableFire(flameThrower);;
+                Debug.Log("flamethrowering");
+                EnableFire(flameThrower);
+
             }
         }
         else
@@ -84,6 +86,7 @@ public class FireHand : MonoBehaviour
         if (rightHandFire != null)
         {
             rightHandFire.Play();
+            Debug.Log("isfireactive");
             isFireActive = true;
         }
         if (leftHandFire != null)
@@ -119,7 +122,6 @@ public class FireHand : MonoBehaviour
         if (particleSystem != null)
         {
             particleSystem.Play();
-            isFireActive = true;
         }
     }
 
@@ -128,7 +130,6 @@ public class FireHand : MonoBehaviour
         if (particleSystem != null)
         {
             particleSystem.Stop();
-            isFireActive = false;
         }
     }
 }

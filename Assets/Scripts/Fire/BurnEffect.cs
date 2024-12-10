@@ -19,12 +19,19 @@ public class BurnEffect : MonoBehaviour
     {
         if (other.tag == "Burnable")
         {
-            if (TryGetComponent<Renderer>(out Renderer renderer))
+            if (other.TryGetComponent<Renderer>(out Renderer renderer))
             {
-                if (renderer.material.HasFloat("_burnAmount")) 
+                if (renderer.materials[1].HasFloat("_burnAmount")) 
                 {
-
-                    renderer.material.SetFloat("_burnAmount", renderer.material.GetFloat("_burnAmount") <= 1.0f ? renderer.material.GetFloat("_burnAmount") + burnIncrement : 1.0f);
+                    Debug.Log("hit");
+                    if (renderer.materials[1].GetFloat("_burnAmount") <= 1.0f)
+                    {
+                        renderer.materials[1].SetFloat("_burnAmount", renderer.materials[1].GetFloat("_burnAmount") + renderer.material.GetFloat("_burnAmount") + burnIncrement);
+                    }
+                    else
+                    {
+                        renderer.materials[1].SetFloat("_burnAmount", 1.0f);
+                    }
                 }
             }
         }

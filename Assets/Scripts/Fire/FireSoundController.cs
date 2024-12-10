@@ -40,10 +40,19 @@ public class FireSoundController : MonoBehaviour
         if (fireActive)
         {
             if (!fireAudioSource.isPlaying) fireAudioSource.Play();
+            if (poseScriptableObject.closeHands)
+            {
+                if (!flameThrowerAudioSource.isPlaying) flameThrowerAudioSource.Play();
+            }
+            else
+            {
+                if (flameThrowerAudioSource.isPlaying) flameThrowerAudioSource.Stop();
+            }
         }
         else
         {
             if (fireAudioSource.isPlaying) fireAudioSource.Stop();
+            if (flameThrowerAudioSource.isPlaying) flameThrowerAudioSource.Stop();
         }
     }
 
@@ -56,7 +65,7 @@ public class FireSoundController : MonoBehaviour
     private void DeactivateFireSounds()
     {
         fireActive = false;
-        fireAudioSource.PlayOneShot(flameThrowerLoopClip);
+        //fireAudioSource.PlayOneShot(flameThrowerLoopClip);
         if (fireAudioSource.isPlaying) fireAudioSource.Stop();
     }
 
