@@ -3,7 +3,7 @@ Shader "David/Participating_Media/AoEWindAesthetic"
     Properties
     {
         _CameraDepthTexture ("Depth Texture", 2D) = "white" {}
-        _BaseColor ("Base color", Color) = (1.0, 1.0, 1.0, 1.0)
+        _BaseColor ("Base color", Color) = (1.0, 0.0, 0.0, 1.0)
         _Center ("Center", Vector) = (0.0, 0.0, 0.0, 0.0)
         _Radius ("Radius", Range(0.1, 4.0)) = 0.5
         _Frequency ("Frequency", Range(0.0, 80.0)) = 40.0
@@ -11,6 +11,8 @@ Shader "David/Participating_Media/AoEWindAesthetic"
         _Absorption ("Absorption coefficient", Range(0.0, 1.0)) = 0.5
         _Scattering ("Scattering coefficient", Range(0.0, 1.0)) = 0.5
         _Asymmetry ("P(x) Asymmetry", Range(-1.0, 1.0)) = 0.0
+        _SampleXYZOffSet ("Sample XYZ Offset", Vector) = (1.0, 1.0, 1.0, 0.0)
+        _WindSpeed ("Wind speed", Range(10.0, 80.0)) = 10.0
     }
     SubShader
     {
@@ -48,6 +50,8 @@ Shader "David/Participating_Media/AoEWindAesthetic"
             float   _Scattering;  // in-scattering, the probability of light being scatter into the viewing ray
             float   _Visibility;  // Controlls the overall alpha value
             float   _Asymmetry;
+            float4  _SampleXYZOffSet; // Controls the shade of the noise
+            float   _WindSpeed; // Constrols the speed rotation of the wind
             CBUFFER_END
 
             TEXTURE2D(_CameraDepthTexture);
@@ -88,6 +92,39 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                 return zNear * zFar / (zFar + depth * (zNear - zFar));
             }
 
+            float smoothstep(float lo, float hi, float x)
+            {
+                float t = clamp((x - lo) / (hi - lo), 0.0, 1.0);
+                return t * t * (3.0 - (2.0 * t));
+            }
+
+            float evalDensityFalloff(float3 sample_pos, float3 sphere_center, float sphere_radius)
+            {
+                
+                float3 vp = sample_pos.xyz - sphere_center.xyz;
+                float3 vp_xform;
+                float theta = M_PI * _Time * _WindSpeed;
+                vp_xform.x =  cos(theta) * vp.x + sin(theta) * vp.z;
+                vp_xform.y =  vp.y;
+                vp_xform.z = -sin(theta) * vp.x + cos(theta) * vp.z;
+                
+                float f = _Frequency;
+                // float densityValue = (noise(    0.1 * vp_xform.x * f,
+                //                                 vp_xform.y * f, 
+                //                                 0.5 * vp_xform.z * f) + 1.0) * 0.5;
+
+                float densityValueScaled = _SmokeScale * (noise(     
+                    _SampleXYZOffSet.x * _SmokeScale * vp_xform.x + f,
+                    _SampleXYZOffSet.y * _SmokeScale * vp_xform.y, 
+                    _SampleXYZOffSet.z * _SmokeScale * vp_xform.z + f));
+                                              
+                float densityValue = clamp(densityValueScaled, 0.0, 1.0);
+
+                float dist = min(1.0, length(vp.xyz) / sphere_radius);
+                float falloff = smoothstep(0.6, 1, dist); // smooth transition from 0 to 1 as distance goes from 0.1 to 1
+                return densityValue * (1 - falloff);
+            }
+
             v2f vert (mesh_data v)
             {
                 v2f o;
@@ -118,8 +155,8 @@ Shader "David/Participating_Media/AoEWindAesthetic"
 
                 //_Visibility = 1.0;
                 // 1. Define the color of the participating medium
-                float4 volumeColor      = float4(0.0, 0.0, 0.0, 0.0);
-                float4 accumulatedColor = float4(0.0, 0.0, 0.0, 0.0);
+                float4 volumeColor      = float4(_BaseColor.xyz, 0.0);
+                float4 accumulatedColor = float4(_BaseColor.xyz, 0.0);
 
                 // 2. Define the transmittance, which gives how much radiance gets absorpted 
                 // by the participating medium as the light travels through it
@@ -162,11 +199,11 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                         
                         // Density is changed by samplying the procedurally generated density field
                         
-                        density = _SmokeScale * (noise(     abs(_SmokeScale * sample_position.x + (f * 2.0)),
-                                                    abs(_SmokeScale * sample_position.y - f), 
-                                                    abs(_SmokeScale * sample_position.z + f)) + 1.0)  
-                                                                * 0.5;
-
+                        // density = _SmokeScale * (noise(     abs(_SmokeScale * sample_position.x + (f * 2.0)),
+                        //                             abs(_SmokeScale * sample_position.y - f), 
+                        //                             abs(_SmokeScale * sample_position.z + f)) + 1.0)  
+                        //                                         * 0.5;
+                        density = evalDensityFalloff(sample_position, _Center, _Radius);
                         //density = (noise(sample_position.x ,sample_position.y , sample_position.z ) + 1.0) / 2.0;
                         
                         // current sample transparency, Beer's Law, represents how much of the light is being absorbed by the sample
@@ -198,13 +235,14 @@ Shader "David/Participating_Media/AoEWindAesthetic"
                                 transmittance *= d; // we continue but compensate
                         }
                     }
-
-                    volumeColor =  _BaseColor * (1.0 - transmittance) + accumulatedColor;
+                    //float4 tint = float4(_BaseColor.xyz, 1.0);
+                    volumeColor =  (1.0 - transmittance) + accumulatedColor;
                 }
                 else
                 {
                     discard;
                 }
+                volumeColor.xyz *= _BaseColor.xyz;
                 float4 visibility = float4(0,0,0,0);
                 volumeColor.a = volumeColor.a * _Visibility + (1 - _Visibility) * visibility.a;
                 //volumeColor.a = _Visibility;

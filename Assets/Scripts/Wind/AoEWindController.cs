@@ -21,6 +21,21 @@ public class AoEWindController : MonoBehaviour
     [SerializeField] private float _effectDuration = 5;
     [SerializeField] private bool _effectActive = false;
 
+    //_SampleXYZOffSet
+    [Tooltip("Controls the shade of the noise")]
+    [SerializeField] private Vector3 _sampleXYZOffSet = Vector3.one;
+    //_BaseColor
+    [Tooltip("Color of the smoke")]
+    [SerializeField] private Color _baseColor = Color.white;
+    //_WindSpeed
+    [Tooltip("Speed of the smoke")]
+    [Range(10, 80)]
+    [SerializeField] private float _windSpeed = 10.0f;
+
+    //SoundFX
+    [SerializeField]
+    private AudioSource _windSound;
+
     private delegate void AoEWindControllerDelegate();
 
     private event AoEWindControllerDelegate OnAoEActivated;
@@ -78,6 +93,8 @@ public class AoEWindController : MonoBehaviour
         }
         
         AoEMechanicsLogic();
+        UpdateWindDoneCenter();
+        UpdateWindDoneAoE();
 
     }
     #endregion Unity MonoBehaviour
@@ -99,6 +116,9 @@ public class AoEWindController : MonoBehaviour
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshRenderer.enabled = false;
         UpdateShaderVariables();
+
+        _windSound = GetComponent<AudioSource>();
+        _windSound.loop = false;
 
         if (!_poseScriptableObject)
             throw new NullReferenceException("The PoseScriptableObject is missing on the AoEWindController");
@@ -123,6 +143,7 @@ public class AoEWindController : MonoBehaviour
 
         if (_effectActive && !_effectInProgress)
             _effectInProgress = true;
+        
 
         if (!_effectActive)
         {
@@ -133,6 +154,7 @@ public class AoEWindController : MonoBehaviour
                 _effectCounter = 0.0f;
                 _hasFadedIn = false;
                 _hasFadedOut = false;
+                _windSound.Stop();
             }
         }
         _meshRenderer.enabled = _effectInProgress || _visibility > 0.0f;
@@ -144,7 +166,7 @@ public class AoEWindController : MonoBehaviour
     {
         FadeInVisibility();
         _effectCounter += 1.0f * Time.deltaTime;
-
+        _windSound.Play();
         if (_effectCounter > _effectDuration)
             if (FadeOutVisibility())
             {
@@ -170,9 +192,22 @@ public class AoEWindController : MonoBehaviour
     {
         _windMaterial.SetFloat("_Visibility", _visibility);
         _windMaterial.SetVector("_Center", transform.position);
+        _windMaterial.SetVector("_SampleXYZOffSet", _sampleXYZOffSet);
+        _windMaterial.SetVector("_BaseColor", _baseColor);
+    }
+
+    private void UpdateWindDoneAoE()
+    {
         _windMaterial.SetFloat("_Radius", _areaOfEffect);
     }
 
+    private void UpdateWindDoneCenter()
+    {
+        _windMaterial.SetVector("_Center", transform.position);
+        _windMaterial.SetVector("_SampleXYZOffSet", _sampleXYZOffSet);
+        _windMaterial.SetVector("_BaseColor", _baseColor);
+        _windMaterial.SetFloat("_WindSpeed", _windSpeed);
+    }
     private bool FadeInVisibility()
     {
         if (_hasFadedIn) return true;
