@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8635315695890199588
+--- !u!114 &-2346655105156172328
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,21 +20,16 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterMaterial
-  m_Shader: {fileID: 4800000, guid: 50dd82b60e1d50246813022b0c5300ef, type: 3}
+  m_Name: Caustics
+  m_Shader: {fileID: 4800000, guid: a1e1a7c29b45124409283cbd52a22e12, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _ALPHATEST_ON
-  - _NORMALMAP
-  - _SPECULAR_SETUP
-  m_InvalidKeywords:
-  - _EMISSION
-  - _ENVIRONMENTREFLECTIONS_OFF
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 1
-  m_CustomRenderQueue: 3001
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3002
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -42,11 +37,15 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: cba3c89ca24e651419e64163b4776a8e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 76fa73fedb222804d9e5298f79a7c760, type: 3}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CausticsTexture:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -62,7 +61,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: cc35a3a4e06d18b498277377b5207afb, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -71,14 +70,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MetallicSpecGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 76fa73fedb222804d9e5298f79a7c760, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -108,60 +99,52 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _AlphaTestToggle: 1
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _BumpScale: 2
+    - _BumpScale: 1
+    - _CausticsAngleScale: 0.5
+    - _CausticsFadeRadius: 0.3
+    - _CausticsFadeStrength: 0.882
+    - _CausticsLuminanceMaskStrength: 0.3
+    - _CausticsScale: 0.2
+    - _CausticsSpeed: 0.3
+    - _CausticsSplit: 0.01
+    - _CausticsStrength: 0
+    - _CausticsUVRatio: 0.75
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _Dissolve: 1
-    - _DissolveScale: 100
-    - _DissolveSpeed: 0.2
-    - _Distortion: 0.03
-    - _DistortionScale: 3.59
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission: 1
     - _EnvironmentReflections: 1
-    - _EnvironmentalReflections: 1
-    - _FresnelPower: 5
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _MetallicSpecGlossMapToggle: 0
-    - _MetallicSpecToggle: 1
-    - _NormalMapToggle: 1
-    - _NormalSpeed: 0.64
-    - _NormalStrength: 1
-    - _NormalTiling: 0.2
     - _OcclusionStrength: 1
-    - _OcclusionToggle: 0
     - _Parallax: 0.005
-    - _PreviewNoise: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.604
-    - _SmoothnessInput: 0.5
-    - _SmoothnessSource: 0
+    - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 0
+    - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _VertexDisplacement: 0.01
-    - _VertexNoiseScale: 5
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 0}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _CausticsSpeed: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 1367.1202, g: 1367.1202, b: 1367.1202, a: 1}
-    - _SpecColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 0}
-    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _MainLightDirectionRow0: {r: -20.596638, g: 77.187546, b: -60.148674, a: -1.1373856}
+    - _MainLightDirectionRow1: {r: 5.518902, g: -60.452473, b: -79.467224, a: 2.9305706}
+    - _MainLightDirectionRow2: {r: -97.700165, g: -19.687128, b: 8.191275, a: -1.6398232}
+    - _MainLightDirectionRow3: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
