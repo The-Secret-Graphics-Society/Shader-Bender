@@ -6,7 +6,7 @@ using static ElementState;
 public class LightningSource : MonoBehaviour
 {
     public Transform[] lightningTargetPoints;
-    public Transform lightningSpawnPoint;
+    public Transform[] lightningSpawnPoints;
     [SerializeField] private PoseScriptableObject pose;
 
     [SerializeField] private LSystemLightning[] lightningGroup;
@@ -21,6 +21,10 @@ public class LightningSource : MonoBehaviour
         for (int i = 0; i < lightningGroup.Length; i++)
         {
             lightningGroup[i].animating = false;
+
+            // set all target and spawn points to inactive
+            lightningTargetPoints[i].gameObject.SetActive(false);
+            lightningSpawnPoints[i].gameObject.SetActive(false);
         }
         ElementState.onLightningActive += SpawnLightning;
         ElementState.onElementDeactivate += DeactivateLightning;
@@ -36,6 +40,10 @@ public class LightningSource : MonoBehaviour
         for (int i = 0; i < lightningGroup.Length; i++)
         {
             lightningGroup[i].animating = false;
+
+            // set all target and spawn points to inactive
+            lightningTargetPoints[i].gameObject.SetActive(false);
+            lightningSpawnPoints[i].gameObject.SetActive(false);
         }
         isLightningActive = false;
     }
@@ -47,6 +55,10 @@ public class LightningSource : MonoBehaviour
         for (int i = 0; i < lightningGroup.Length; i++)
         {
             lightningGroup[i].animating = true;
+
+            // set all target and spawn points to inactive
+            lightningTargetPoints[i].gameObject.SetActive(true);
+            lightningSpawnPoints[i].gameObject.SetActive(true);
         }
         isLightningActive = true;
         StartCoroutine(SpawnLightningCoroutine());
@@ -58,8 +70,11 @@ public class LightningSource : MonoBehaviour
         while (isLightningActive)
         {
             // track the direction of the lightning spawn point
-            lightningSpawnPoint.position = (pose.GetCurrentLeftHandPosition() + pose.GetCurrentRightHandPosition()) / 2f;
-            lightningSpawnPoint.forward = -(lightningSpawnPoint.position -pose.GetCurrentChestPosition()).normalized;
+            for (int i = 0; i < lightningSpawnPoints.Length; i++)
+            {
+                lightningSpawnPoints[i].position = (pose.GetCurrentLeftHandPosition() + pose.GetCurrentRightHandPosition()) / 2f;
+                lightningSpawnPoints[i].rotation = pose.jointHandRotation;
+            }
             // and update the target points
             yield return null;
         }
@@ -69,21 +84,27 @@ public class LightningSource : MonoBehaviour
         while (isLightningActive) {
             // fire raycasts and spawn a lightning 
             // raycast source from spawnpoint forward with the angle range
-            Vector3 raycastDirection = lightningSpawnPoint.forward;
             for (int i = 0; i < lightningTargetPoints.Length; i++)
             {
                 yield return new WaitForSeconds(lightningSpawnRate);
-                //fire raycast
-                //RaycastHit hit;
-                lightningTargetPoints[i].position = lightningSpawnPoint.position + raycastDirection * lightningRaycastRange;
-                //if (Physics.Raycast(lightningSpawnPoint.position, raycastDirection, out hit, lightningRaycastRange))
-                //{
-                //    lightningTargetPoints[i].position = hit.point;
-                //}
-                //else
-                //{
-                //    lightningTargetPoints[i].position = lightningSpawnPoint.position + raycastDirection * lightningRaycastRange;
-                //}
+                lightningTargetPoints[i].position = lightningSpawnPoints[i].position + lightningSpawnPoints[i].forward * lightningRaycastRange;
+
+                // add a random offset vector to the target point that is orthagonal to the forward vector
+                Vector3 offset = Vector3.Cross(lightningSpawnPoints[i].forward, Vector3.up) * Random.Range(-lightningRaycastAngleRange, lightningRaycastAngleRange);
+                // randomize the angle of the offset vector
+                offset = Quaternion.AngleAxis(Random.Range(-lightningRaycastAngleRange, lightningRaycastAngleRange), lightningSpawnPoints[i].forward) * offset;
+                lightningTargetPoints[i].position += Vector3.Normalize(offset) * 2f;
+
+                //raycast to the target point, and if an intersection is found, use that point as the target
+                RaycastHit hit;
+                if (Physics.Raycast(lightningSpawnPoints[i].position, lightningTargetPoints[i].position - lightningSpawnPoints[i].position, out hit, lightningRaycastRange))
+                {
+                    // check if hit the surface layer
+                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Surface"))
+                    {
+                        lightningTargetPoints[i].position = hit.point;
+                    }
+                }
             }
         }
 
