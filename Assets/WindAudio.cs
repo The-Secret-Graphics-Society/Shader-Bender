@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WindAudio : MonoBehaviour
 {
-    private AudioSource _windSound;
+    public AudioSource _windSound;
     // Start is called before the first frame update
     void Start()
     {

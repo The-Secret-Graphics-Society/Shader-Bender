@@ -2276,7 +2276,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
-  - {fileID: 2100000, guid: e09f98b109c61420492ea1ebe1aa400a, type: 2}
+  - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3995,6 +3995,7 @@ MonoBehaviour:
   - {fileID: 1974886775}
   - {fileID: 1296928640}
   - {fileID: 1599910917}
+  - {fileID: 989853618}
   reset: 0
 --- !u!1 &1532243478
 GameObject:
@@ -5049,6 +5050,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 994ec6fc802d3408883339d336e0f4e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _windSound: {fileID: 1831627014}
+--- !u!82 &1831627014 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1310151561172587476, guid: 328345a9406a04cc1a59320ce39ddf19,
+    type: 3}
+  m_PrefabInstance: {fileID: 196418575}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1912450868
 GameObject:
   m_ObjectHideFlags: 0

@@ -154,7 +154,7 @@ public class AoEWindController : MonoBehaviour
                 _effectCounter = 0.0f;
                 _hasFadedIn = false;
                 _hasFadedOut = false;
-                _windSound.Stop();
+                //_windSound.Stop();
             }
         }
         _meshRenderer.enabled = _effectInProgress || _visibility > 0.0f;
@@ -166,7 +166,7 @@ public class AoEWindController : MonoBehaviour
     {
         FadeInVisibility();
         _effectCounter += 1.0f * Time.deltaTime;
-        _windSound.Play();
+        //_windSound.Play();
         if (_effectCounter > _effectDuration)
             if (FadeOutVisibility())
             {
