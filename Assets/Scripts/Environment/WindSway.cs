@@ -106,13 +106,11 @@ public class WindSway : MonoBehaviour
 
     private void AoEActivated()
     {
-        Debug.Log("AoEActivated");
         currentState = state.high;
     }
     
     private void AoEDeactivated()
     {
-        Debug.Log("AoEDeactivated");
         currentState = state.ambient;
     }
 

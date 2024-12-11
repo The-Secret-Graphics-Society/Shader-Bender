@@ -116,6 +116,7 @@ public class WaterSoundController : MonoBehaviour
 
     private void DeactivateWaterSounds()
     {
+        if (!waterActive) return;
         waterActive = false;
 
         if (deactivationClips != null && deactivationClips.Length > 0)

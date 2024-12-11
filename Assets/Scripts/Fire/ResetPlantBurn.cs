@@ -16,10 +16,10 @@ public class ResetPlantBurn : MonoBehaviour
             {
                 if (plant.TryGetComponent<Renderer>(out Renderer renderer))
                 {
-                    Debug.Log("resetting burn");
+                    //Debug.Log("resetting burn");
                     if (renderer.materials[1].HasFloat("_burnAmount"))
                     {
-                        Debug.Log("reset");
+                        //Debug.Log("reset");
 
                         renderer.materials[1].SetFloat("_burnAmount", 0.0f);
                     }
