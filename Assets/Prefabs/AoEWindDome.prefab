@@ -51,9 +51,9 @@ MonoBehaviour:
     type: 2}
   _areaOfEffect: 1.5
   _effectDuration: 10
-  _effectActive: 1
-  _sampleXYZOffSet: {x: 0.6, y: 9, z: 0.6}
-  _baseColor: {r: 0.7647059, g: 0.88235295, b: 0.9843137, a: 1}
+  _effectActive: 0
+  _sampleXYZOffSet: {x: 0.2, y: 6, z: 0.2}
+  _baseColor: {r: 0.9254902, g: 0.87058824, b: 0.8627451, a: 1}
   _windSpeed: 60
   _windSound: {fileID: 1310151561172587476}
   _visibility: 0
