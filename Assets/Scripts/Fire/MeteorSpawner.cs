@@ -13,10 +13,14 @@ public class MeteorSpawner : MonoBehaviour
     public bool canSpawnMeteor = true;
     //public int meteorCount = 1;
     public MeteorSound meteorSound;
+    private float time;
+    private bool _meteorTimerStarted = false;
+
 
     void Start()
     {
         interaction = false;
+
     }
 
     void Update()
@@ -24,10 +28,15 @@ public class MeteorSpawner : MonoBehaviour
         if (_poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder)
         {
             rightHandRaised = true;
+            if(!_meteorTimerStarted) {
+                time = Time.time;
+                _meteorTimerStarted = true; 
+            }
             //Debug.Log("right hand raised");
         }
         if(!_poseScriptableObject.isLeftHandAboveShoulder && rightHandRaised)
             {
+                _meteorTimerStarted = false;
                 interaction = true;
                 rightHandRaised = false;
                 //Debug.Log("right hand lowered");
@@ -35,7 +44,7 @@ public class MeteorSpawner : MonoBehaviour
         // When the interaction criteria is met, we spawn in the fireEruption
         if (interaction)
         {
-            if(canSpawnMeteor)
+            if(canSpawnMeteor && (Time.time - time) > 2.0f)
             {
                 MeteorShower();
             }
