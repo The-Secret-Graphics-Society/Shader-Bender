@@ -9,10 +9,8 @@ public class FireHand : MonoBehaviour
     [SerializeField] private ParticleSystem rightHandFire;
     [SerializeField] private ParticleSystem leftHandFire;
     [SerializeField] private ParticleSystem flameThrower;
-    [SerializeField, Tooltip("If we should play the fire in both hands")]
-    private bool fireInBothHands = true;
     [SerializeField] private bool isFireActive = false;
-    private bool wasRightHandRaised = false;
+    [SerializeField] private Light flamethrowerLight;
 
     private void OnEnable()
     {
@@ -45,39 +43,22 @@ public class FireHand : MonoBehaviour
             flameThrower.gameObject.transform.rotation = _poseScriptableObject.jointHandRotation;
         }
 
-        bool isRightHandCurrentlyRaised = _poseScriptableObject.isLeftHandAboveShoulder && !_poseScriptableObject.isRightHandAboveShoulder;
-        bool areBothHandsRaised = _poseScriptableObject.isLeftHandAboveShoulder && _poseScriptableObject.isRightHandAboveShoulder;
         bool areHandsClose = _poseScriptableObject.closeHands;
-        bool areArmsExtended = _poseScriptableObject.leftArmExtended && _poseScriptableObject.rightArmExtended;
-
-        //if (isRightHandCurrentlyRaised && !wasRightHandRaised)
-        //{
-        //    if (isFireActive)
-        //    {
-        //        DisableFire(rightHandFire);
-        //        if (fireInBothHands) DisableFire(leftHandFire);
-        //    }
-        //    else
-        //    {
-        //        EnableFire(rightHandFire);
-        //        if (fireInBothHands) EnableFire(leftHandFire);
-        //    }
-        //}
-
-        wasRightHandRaised = isRightHandCurrentlyRaised;
 
         if (areHandsClose)
         {
             if (isFireActive)
             {
-                Debug.Log("flamethrowering");
+                //Debug.Log("flamethrowering");
                 EnableFire(flameThrower);
+                if (flamethrowerLight != null) flamethrowerLight.enabled = true;
 
             }
         }
         else
         {
             DisableFire(flameThrower);
+            if (flamethrowerLight != null) flamethrowerLight.enabled = false;
         }
     }
 

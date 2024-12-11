@@ -50,7 +50,8 @@ MonoBehaviour:
   rightHandFire: {fileID: 8885219830897690105}
   leftHandFire: {fileID: 8312413307380400318}
   flameThrower: {fileID: 8024218118551400223}
-  fireInBothHands: 1
+  isFireActive: 0
+  flamethrowerLight: {fileID: 4394833368889924603}
 --- !u!114 &5711058955032784009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,6 +311,12 @@ PrefabInstance:
 --- !u!4 &1648883559212772102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4242791701076954677, guid: 750ed56716faa274ba1a180be0178336,
+    type: 3}
+  m_PrefabInstance: {fileID: 3171499847114106163}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &4394833368889924603 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 1224693108714159816, guid: 750ed56716faa274ba1a180be0178336,
     type: 3}
   m_PrefabInstance: {fileID: 3171499847114106163}
   m_PrefabAsset: {fileID: 0}
