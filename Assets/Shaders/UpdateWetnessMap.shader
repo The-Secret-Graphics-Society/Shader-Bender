@@ -9,6 +9,7 @@ Shader "Custom/UpdateWetnessMap"
         _Darkness("Darkness Amount", Range(0, 1)) = 0.05
         _Range("Wetness Range", Float) = 0.5
         _FadeSpeed("Fade Speed", Float) = 0.2
+        _BlurSpeed("Blur Speed", Float) = 0.5
         _NoiseScale("Noise Scale", Float) = 50.0
 
         _WorldOrigin("World Origin", Vector) = (0,0,0)
@@ -29,6 +30,7 @@ Shader "Custom/UpdateWetnessMap"
             CGPROGRAM
             #include "UnityCustomRenderTexture.cginc"
             #include "UnityCG.cginc"
+            #include "Includes/GaussianBlur.cginc"
             #include "Includes/PerlinNoise2D.cginc"
             #pragma vertex CustomRenderTextureVertexShader
             #pragma fragment frag
@@ -41,6 +43,7 @@ Shader "Custom/UpdateWetnessMap"
             float _Darkness;
             float _Range;
             float _FadeSpeed;
+            float _BlurSpeed;
             float _NoiseScale;
             float3 _WorldOrigin;
             float4 _WorldScale;
@@ -58,6 +61,8 @@ Shader "Custom/UpdateWetnessMap"
                 
                 float dt = unity_DeltaTime.x;
                 wetnessFactor = max(wetnessFactor - _FadeSpeed * dt, 0.0);
+                float blurredValue = gaussianBlur(float2(1.0/1024.0, 1.0/1024.0), uv, _WetnessMap);
+                wetnessFactor = saturate(lerp(wetnessFactor, blurredValue, _BlurSpeed * dt));
 
                 if (_WaterActive > 0.0)
                 {
