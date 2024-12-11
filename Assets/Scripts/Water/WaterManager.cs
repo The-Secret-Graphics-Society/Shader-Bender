@@ -32,6 +32,7 @@ public class WaterManager : MonoBehaviour
     private Coroutine causticCoroutine;
     private bool isWaterActive = false;
     private float causticTransformHeight = 0f;
+    public float refractiveIndex = 1.33f; // Refractive index of water
 
     void Awake()
     {
@@ -84,11 +85,7 @@ public class WaterManager : MonoBehaviour
             //rightHandWater.gameObject.transform.rotation = _poseScriptableObject.leftHandRotation;
             if (customRenderMaterial != null) customRenderMaterial.SetVector("_RightHandPos", rightHandPosition);
 
-            if (rightHandCaustics != null)
-            {
-                Vector3 lightOffset = (rightHandPosition - mainLight.position) / 20;
-                rightHandCaustics.transform.position = new Vector3(rightHandPosition.x + lightOffset.x, causticTransformHeight + lightOffset.y, rightHandPosition.z + lightOffset.z);
-            }
+            if (rightHandCaustics != null && isWaterActive) PositionCausticVolume(rightHandPosition, rightHandCaustics.transform);
         }
 
         if (leftHandWater != null)
@@ -98,11 +95,7 @@ public class WaterManager : MonoBehaviour
             //leftHandWater.gameObject.transform.rotation = _poseScriptableObject.rightHandRotation;
             if (customRenderMaterial != null) customRenderMaterial.SetVector("_LeftHandPos", leftHandPosition);
 
-            if (leftHandCaustics != null)
-            {
-                Vector3 lightOffset = (leftHandPosition - mainLight.position) / 20;
-                leftHandCaustics.transform.position = new Vector3(leftHandPosition.x + lightOffset.x, causticTransformHeight + lightOffset.y, leftHandPosition.z + lightOffset.z);
-            }
+            if (leftHandCaustics != null && isWaterActive) PositionCausticVolume(leftHandPosition, leftHandCaustics.transform);
         }
     }
 
@@ -150,6 +143,25 @@ public class WaterManager : MonoBehaviour
             float currentStrength = causticsMaterial.GetFloat("_CausticsStrength");
             causticCoroutine = StartCoroutine(CausticStrengthTransition(currentStrength, targetStrength, causticActivationTime));
         }
+    }
+
+    void PositionCausticVolume(Vector3 waterSphere, Transform causticVolume)
+    {
+        // Light direction and approximate the sphere normal
+        Vector3 lightDirection = (waterSphere - mainLight.position).normalized;
+        Vector3 sphereNormal = Vector3.down;
+
+        // Calculate incidence angle and refracted direction
+        float cosThetaIncident = Vector3.Dot(-lightDirection, sphereNormal);
+        float sinThetaRefracted = Mathf.Sin(Mathf.Acos(cosThetaIncident)) / refractiveIndex;
+        float cosThetaRefracted = Mathf.Sqrt(1 - sinThetaRefracted * sinThetaRefracted);
+        Vector3 refractedDirection = lightDirection / refractiveIndex + (cosThetaRefracted - cosThetaIncident / refractiveIndex) * sphereNormal;
+        refractedDirection.Normalize();
+
+        // Project refracted ray to floor
+        float t = (causticTransformHeight - waterSphere.y) / refractedDirection.y;
+        Vector3 causticPosition = waterSphere + refractedDirection * t;
+        causticVolume.position = new Vector3(causticPosition.x, causticTransformHeight, causticPosition.z);
     }
 
     private IEnumerator CausticStrengthTransition(float startStrength, float endStrength, float duration)
