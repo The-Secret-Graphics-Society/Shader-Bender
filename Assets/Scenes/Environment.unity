@@ -436,6 +436,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8067333758290557808, guid: d7db87ac9457c854d98070e55169604d,
+        type: 3}
+      propertyPath: mainLight
+      value: 
+      objectReference: {fileID: 1217690265}
     - target: {fileID: 9091054538682223856, guid: d7db87ac9457c854d98070e55169604d,
         type: 3}
       propertyPath: m_Name
@@ -2741,6 +2746,12 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!4 &1217690265 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2302001131696465621, guid: 18cd24b62ae1848ebb41e38a3ee58087,
+    type: 3}
+  m_PrefabInstance: {fileID: 1296928636}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1240335860 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5280663178459593808, guid: a5b9b242215dbfd4c9dab8de8d9ddf20,
