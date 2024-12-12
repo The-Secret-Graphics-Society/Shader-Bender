@@ -1,40 +1,39 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.EventSystems;
+using UnityEngine.Rendering.PostProcessing;
 
 [RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
 public class WindSway : MonoBehaviour
 {
-    private Mesh mesh;
-    private Vector3[] verts;
-    private Vector3[] originalVerts;
-    private float[] randomOffsets;
-
     public float freq;
     public float windForce = 0.1f;
     public float ratio = 1.0f;
-
     public float originY = 0.2f;
     public bool originDirection; //true is up, false is down
-
     public float distanceMultiplier = 2.0f;
-    public float direction; // goes from 0 to 2*PI, wind direction
+    public float angleRadians;
+    public bool calculateOrigin = true;
+    public bool calculateYAxisScale = true;
+    public bool calculateAngle = true;
 
     private float _startFreq;
     private float _startWindForce;
     private float _startRatio;
     private float _startDistanceMultiplier;
-    private float _startDirection;
-
+    private float yAxisScale = 1.0f;
+    public float localSpaceHeight = 0.0f;
+    private Matrix4x4 worldToLocal;
+    private Matrix4x4 localToWorld;
     private float aimfreq;
     private float aimwindForce;
     private float aimratio;
     private float aimdistanceMultiplier;
-    private float aimdirection;
-
     private IEnumerator transitionCoroutine;
+    private MeshRenderer renderer;
+    private Material[] materials;
 
     public enum oType
     {
@@ -64,40 +63,65 @@ public class WindSway : MonoBehaviour
 
     void Start()
     {
+        if (calculateOrigin || calculateYAxisScale)
+        {
+            Mesh mesh = GetComponent<MeshFilter>().mesh;
+
+            if (mesh != null)
+            {
+                Vector3 yMax = Vector3.zero;
+                Vector3 yMin = Vector3.zero;
+                Vector3[] verts = mesh.vertices;
+
+                foreach (Vector3 vert in verts)
+                {
+                    if (vert.y < yMin.y) yMin = vert;
+                    if (vert.y > yMax.y) yMax = vert;
+                }
+
+                originY = calculateOrigin ? ((originDirection ? yMax : yMin) - transform.localPosition).y : originY;
+                float yDifference = Mathf.Abs(transform.TransformPoint(yMax - yMin).y);
+                if (yDifference != 0) yAxisScale = calculateYAxisScale ? yDifference : 1.0f;
+            }
+        }
+
+        worldToLocal = transform.worldToLocalMatrix;
+        localToWorld = transform.localToWorldMatrix;
+
         _startFreq = freq;
         _startWindForce = windForce;
         _startRatio = ratio;
         _startDistanceMultiplier = distanceMultiplier;
-        _startDirection = direction;
 
-        mesh = GetComponent<MeshFilter>().mesh;
-        mesh.MarkDynamic();
-        verts = mesh.vertices;
-        originalVerts = new Vector3[verts.Length];
-        randomOffsets = new float[verts.Length];
+        renderer = GetComponent<MeshRenderer>();
+        Vector3 centerPoint = renderer.bounds.center;
+        originY = centerPoint.y - (calculateOrigin ? originY : (transform.localPosition.y - originY));
+        localSpaceHeight = transform.InverseTransformPoint(centerPoint.x, originY, centerPoint.z).y;
+        angleRadians = calculateAngle ? Mathf.Atan2(centerPoint.z, centerPoint.x) : angleRadians;
 
-        for (int i = 0; i < verts.Length; i++)
-        {
-            originalVerts[i] = verts[i];
-            float randomValue = UnityEngine.Random.Range(0f, 0.01f);
-            randomOffsets[i] = randomValue;
-        }
+        materials = renderer.materials;
+        UpdateMaterials();
 
         currentState = state.ambient;
-        onStateChanged += stateChanged;
+        onStateChanged += StateChanged;
 
         ElementState.onAirActive += AoEActivated;
         ElementState.onElementDeactivate += AoEDeactivated;
     }
 
-    private void stateChanged(state state)
+    void Update()
+    {
+        UpdateMaterials();
+    }
+
+    private void StateChanged(state state)
     {
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
 
-        if (currentState == state.ambient) setLow();
-        if (currentState == state.high) setHigh();
+        if (currentState == state.ambient) SetLow();
+        if (currentState == state.high) SetHigh();
 
-        transitionCoroutine = smoothTransition();
+        transitionCoroutine = SmoothTransition();
         StartCoroutine(transitionCoroutine);
     }
 
@@ -117,7 +141,7 @@ public class WindSway : MonoBehaviour
         currentState = state.ambient;
     }
 
-    private void setHigh()
+    private void SetHigh()
     {
         if (objectType == oType.lightstrip)
         {
@@ -125,7 +149,6 @@ public class WindSway : MonoBehaviour
             aimwindForce = 0.22f;
             aimratio = 0.25f;
             aimdistanceMultiplier = 1.0f;
-            //aimdirection = 6.17f;
 
         }
         if (objectType == oType.plant)
@@ -134,11 +157,19 @@ public class WindSway : MonoBehaviour
             aimwindForce = 1.0f;
             aimratio = 0.25f;
             aimdistanceMultiplier = 1.0f;
-            //aimdirection = 6.17f;
         }
     }
 
-    private IEnumerator smoothTransition()
+    private void SetLow()
+    {
+        //aimdirection = _startDirection;
+        aimfreq = _startFreq;
+        aimwindForce = _startWindForce;
+        aimratio = _startRatio;
+        aimdistanceMultiplier = _startDistanceMultiplier;
+    }
+
+    private IEnumerator SmoothTransition()
     {
         float moveSpeed = 1.0f;
         float threshold = 0.01f;
@@ -150,13 +181,11 @@ public class WindSway : MonoBehaviour
             windForce = Mathf.MoveTowards(windForce, aimwindForce, moveSpeed * Time.deltaTime);
             ratio = Mathf.MoveTowards(ratio, aimratio, moveSpeed * Time.deltaTime);
             distanceMultiplier = Mathf.MoveTowards(distanceMultiplier, aimdistanceMultiplier, moveSpeed * Time.deltaTime);
-            //direction = Mathf.MoveTowards(direction, aimdirection, moveSpeed*10.0f * Time.deltaTime);
 
             if (Mathf.Abs(freq - aimfreq) < threshold &&
                 Mathf.Abs(windForce - aimwindForce) < threshold &&
                 Mathf.Abs(ratio - aimratio) < threshold &&
-                Mathf.Abs(distanceMultiplier - aimdistanceMultiplier) < threshold) // &&
-                                                                                   //Mathf.Abs(direction - aimdirection) < threshold)
+                Mathf.Abs(distanceMultiplier - aimdistanceMultiplier) < threshold)
             {
                 break;
             }
@@ -165,45 +194,25 @@ public class WindSway : MonoBehaviour
         }
     }
 
-    private void setLow()
+    private void UpdateMaterials()
     {
-        //aimdirection = _startDirection;
-        aimfreq = _startFreq;
-        aimwindForce = _startWindForce;
-        aimratio = _startRatio;
-        aimdistanceMultiplier = _startDistanceMultiplier;
-    }
-
-    private float xSwayFunction(float sinAngle, float r, float cosDir)
-    {
-        float intensity = cosDir * windForce * ratio * sinAngle;
-        float directionalStatic = cosDir * windForce;
-        return directionalStatic + intensity;
-    }
-
-    private float ySwayFunction(float sinAngle, float r, float sinDir)
-    {
-        float intensity = sinDir * windForce * ratio * sinAngle;
-        float directionalStatic = sinDir * windForce;
-        return directionalStatic + intensity;
-    }
-
-    void Update()
-    {
-        float newFreq = freq / 2 + Mathf.PerlinNoise(Time.time * 0.1f, 0.0f) / 2.0f;
-        float cosDir = Mathf.Cos(direction);
-        float sinDir = Mathf.Sin(direction);
-        float timeFactor = Time.time * newFreq;
-        for (int i = 0; i < verts.Length; i++)
+        foreach (Material mat in materials)
         {
-            float distanceFromOrigin = verts[i].y - originY;
-            if (originDirection ? originY < verts[i].y : originY > verts[i].y) continue;
-            float randomValue = randomOffsets[i];
-            float sinAngle = Mathf.Sin(timeFactor + originalVerts[i].y * Mathf.PI);
-
-            verts[i] = originalVerts[i] + distanceMultiplier * distanceFromOrigin * distanceFromOrigin * new Vector3(xSwayFunction(sinAngle, randomValue, cosDir), 0.0f, ySwayFunction(sinAngle, randomValue, sinDir));
+            if (!mat.HasFloat("_CanSway")) continue;
+            if (mat.GetFloat("_CanSway") < 0.5) continue;
+            mat.SetFloat("_Frequency", freq);
+            mat.SetFloat("_WindForce", windForce);
+            mat.SetFloat("_Ratio", ratio);
+            mat.SetFloat("_OriginY", originY);
+            mat.SetFloat("_DistanceMultiplier", distanceMultiplier);
+            mat.SetFloat("_Direction", angleRadians);
+            mat.SetFloat("_OriginDirection", originDirection ? 1.0f : 0.0f);
+            mat.SetFloat("_TimeScale", 1);
+            mat.SetFloat("_YAxisScale", yAxisScale);
+            mat.SetMatrix("_WorldToLocal", worldToLocal);
+            mat.SetMatrix("_LocalToWorld", localToWorld);
         }
 
-        mesh.vertices = verts;
+        renderer.materials = materials;
     }
 }

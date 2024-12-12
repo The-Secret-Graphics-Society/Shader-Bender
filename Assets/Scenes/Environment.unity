@@ -317,10 +317,14 @@ MonoBehaviour:
   freq: 4
   windForce: 0.12
   ratio: 0.17
-  originY: 0.2
+  originY: -0.148
   originDirection: 0
   distanceMultiplier: 1.62
-  direction: 3.27
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!23 &104017979
 MeshRenderer:
@@ -2115,10 +2119,14 @@ MonoBehaviour:
   freq: 5.9
   windForce: 0.06
   ratio: 0.55
-  originY: 0.92
+  originY: 3.503
   originDirection: 1
   distanceMultiplier: 0.35
-  direction: 0
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 1
 --- !u!1 &989853618
 GameObject:
@@ -2191,10 +2199,14 @@ MonoBehaviour:
   freq: 6
   windForce: 0.1
   ratio: 0.165
-  originY: 0.72
+  originY: -0.953
   originDirection: 0
   distanceMultiplier: 2
-  direction: 3.38
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!23 &989853622
 MeshRenderer:
@@ -2216,7 +2228,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
+  - {fileID: 2100000, guid: 5f628966bce378049bc1dff1a77acc34, type: 2}
   - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -2467,10 +2479,14 @@ MonoBehaviour:
   freq: 4
   windForce: 0.12
   ratio: 0.17
-  originY: 0.2
+  originY: -0.194
   originDirection: 0
   distanceMultiplier: 1.62
-  direction: 3.27
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!23 &1091121536
 MeshRenderer:
@@ -2492,7 +2508,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
+  - {fileID: 2100000, guid: 5f628966bce378049bc1dff1a77acc34, type: 2}
   - {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -3035,7 +3051,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
+      objectReference: {fileID: 2100000, guid: 5f628966bce378049bc1dff1a77acc34, type: 2}
     - target: {fileID: -835193960485006441, guid: 18cd24b62ae1848ebb41e38a3ee58087,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3135,6 +3151,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
+      objectReference: {fileID: 2100000, guid: 5f628966bce378049bc1dff1a77acc34, type: 2}
+    - target: {fileID: 2667680191044883685, guid: 18cd24b62ae1848ebb41e38a3ee58087,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
       objectReference: {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
     - target: {fileID: 4839053219256449344, guid: 18cd24b62ae1848ebb41e38a3ee58087,
         type: 3}
@@ -3169,6 +3190,11 @@ PrefabInstance:
     - target: {fileID: 7876821728961113156, guid: 18cd24b62ae1848ebb41e38a3ee58087,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5f628966bce378049bc1dff1a77acc34, type: 2}
+    - target: {fileID: 7876821728961113156, guid: 18cd24b62ae1848ebb41e38a3ee58087,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 208ffd31461a94402a9abf5c039db298, type: 2}
     - target: {fileID: 8009987137999418058, guid: 18cd24b62ae1848ebb41e38a3ee58087,
@@ -3309,10 +3335,14 @@ MonoBehaviour:
   freq: 5.76
   windForce: 0.05
   ratio: 0.65
-  originY: 0.92
+  originY: 3.503
   originDirection: 1
   distanceMultiplier: 0.37
-  direction: 0
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 1
 --- !u!1 &1296928639 stripped
 GameObject:
@@ -3412,10 +3442,14 @@ MonoBehaviour:
   freq: 6
   windForce: 0.1
   ratio: 0.165
-  originY: 0.2
+  originY: -0.167
   originDirection: 0
   distanceMultiplier: 2
-  direction: 3.14
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!1001 &1334924392
 PrefabInstance:
@@ -4450,10 +4484,14 @@ MonoBehaviour:
   freq: 4
   windForce: 0.12
   ratio: 0.17
-  originY: 0.2
+  originY: -0.166
   originDirection: 0
   distanceMultiplier: 1.62
-  direction: 3.27
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!65 &1599910920
 BoxCollider:
@@ -5541,10 +5579,14 @@ MonoBehaviour:
   freq: 6
   windForce: 0.1
   ratio: 0.165
-  originY: 0.72
+  originY: -0.481
   originDirection: 0
   distanceMultiplier: 2
-  direction: 6.17
+  angleRadians: 0
+  calculateOrigin: 0
+  calculateYAxisScale: 0
+  calculateAngle: 1
+  localSpaceHeight: 0
   objectType: 0
 --- !u!65 &1974886778
 BoxCollider:
