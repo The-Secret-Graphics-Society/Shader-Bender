@@ -3,9 +3,7 @@ using UnityEngine;
 using Mediapipe.Unity;
 using Mediapipe.Tasks.Components.Containers;
 using System.Collections;
-using UnityEditor;
 
-[CustomEditor(typeof(PoseManager))]
 public class PoseManager : MonoBehaviour
 {
     [Header("Component References")]

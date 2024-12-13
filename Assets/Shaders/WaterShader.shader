@@ -220,5 +220,4 @@ Shader "Custom/WaterShader"
             ENDHLSL
         }
     }
-    FallBack "Hidden/InternalErrorShader"
 }
