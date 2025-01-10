@@ -1,4 +1,10 @@
 /* Development Section Styling */
+@counter-style repeating-emoji {
+    system: cyclic;
+    symbols: "\1F3AF";
+    suffix: " ";
+}
+
 .element-background {
     background: linear-gradient(135deg, #1d3557, #457b9d, #a8dadc);
     padding: 4rem 0;
@@ -25,9 +31,14 @@
     justify-content: center;
 }
 
-.centered-list ol, .centered-list ul {
+.centered-list ol,
+.centered-list ul {
     text-align: left;
     max-width: 600px;
+}
+
+.bullet-bullseye {
+    list-style-type: repeating-emoji;
 }
 
 @media (max-width: 768px) {

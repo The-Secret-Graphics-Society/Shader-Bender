@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>ShaderBender</title>
 
     <meta property="og:title" content="Shader Bender">
@@ -32,10 +33,10 @@
         <div class="container">
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 1">
+                    <img src="images/photos/development/water_animated.webp" class="img-fluid" alt="Feature 1">
                 </div>
                 <div class="col-md-6">
-                    <h4>Feature 1</h4>
+                    <h4>Water Element</h4>
                     <p>Description 1</p>
                 </div>
             </div>
@@ -45,8 +46,22 @@
                     <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 2">
                 </div>
                 <div class="col-md-6 order-md-1">
-                    <h4>Feature 2</h4>
-                    <p>Description 2</p>
+                    <h4>Environmental Effects and Soundscape</h4>
+                    <p>The rain and lightning effects were all created using Unity's particle systems. For the rain, it
+                        spawns a high rate of particles that simulate rain drops, and despite not being visible in the
+                        project, also spawns water rings on the surface upon collision with the ground. The lightning in
+                        the background is also a particle system that utilizes noise to create a random variation to a
+                        straight line that simulates lightning. Upon birth, the lightning lets off a bright light at the
+                        top, and upon impact it also generates a bright light as well as sparks flying off the ground.
+                        The clouds of ShaderBender were made to look like volume rendered clouds, despite only being a
+                        shader on a simple plane. It was made this way to limit the computational power required, as the
+                        clouds are not a main feature of the game. It works by passing over a simple noise map, with
+                        added effects and some subdivisions to the plane to make it look a bit more 3D. The mountain in
+                        the background was made using the Blender plugin A.N.T Landscape, and was created to somewhat
+                        resemble Mt. Fuji. For the post-processing, effects such as bloom, vignette and white balance
+                        were utilized to create a night time environment. Lastly, the soundscape of the experience was
+                        created utilizing sounds from FreeSound.org, that were then mixed together using the software
+                        Audacity. </p>
                 </div>
             </div>
 
@@ -65,27 +80,27 @@
                     <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 4">
                 </div>
                 <div class="col-md-6 order-md-1">
-                    <h4>Feature 4</h4>
+                    <h4>Motion Capture</h4>
                     <p>Description 4</p>
                 </div>
             </div>
 
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 5">
+                    <img src="images/photos/development/meteor.webp" class="img-fluid" alt="Feature 5">
                 </div>
                 <div class="col-md-6">
-                    <h4>Feature 5</h4>
+                    <h4>Fire Element</h4>
                     <p>Description 5</p>
                 </div>
             </div>
 
             <div class="row align-items-center mb-5">
                 <div class="col-md-6 order-md-2">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 6">
+                    <img src="images/photos/development/wind_look.webp" class="img-fluid" alt="Feature 6">
                 </div>
                 <div class="col-md-6 order-md-1">
-                    <h4>Feature 6</h4>
+                    <h4>Wind Element</h4>
                     <p>Description 6</p>
                 </div>
             </div>
@@ -97,26 +112,45 @@
             <div class="row">
                 <div class="col-md-6">
                     <h2 class="text-center">Goals and Motivation</h2>
-                    <p class="text-center">Big text</p>
+                    <p class="text-center">Our goals when first drafting up what we wanted out of the project were as
+                        follows:</p>
                     <div class="centered-list">
-                        <ol>
-                            <li><i>goal 1</i></li>
-                            <li><i>goal 2</i></li>
-                        </ol>
-                    </div>
-
-                    <p class="text-center">blablabla:</p>
-                    <div class="centered-list">
-                        <ul>
-                            <li>blabla</li>
-                            <li>blabla</li>
+                        <ul class="bullet-bullseye">
+                            <li><i><b>Create</b> an engaging, open-ended interactive experience combining advanced
+                                    visual and
+                                    interaction techniques.</i></li>
+                            <li><i><b>Utilise</b> webcam-based motion capture as the primary input method, ensuring it
+                                    is
+                                    effective and engaging.</i></li>
+                            <li><i><b>Enhance</b> team expertise in shader programming, motion capture, and real-time
+                                    rendering
+                                    methods.</i></li>
                         </ul>
                     </div>
+
+                    <p class="text-center">Our motivation for this project grew from the exciting opportunities it
+                        presented for exploration and learning. By creating an open-ended interactive experience without
+                        a traditional game loop, we aimed to develop something akin to an exhibit at an interactive
+                        museum - a space for creativity and discovery. The novelty of integrating motion capture, a
+                        relatively new area for our team, added an intriguing challenge that pushed us to expand our
+                        technical and design capabilities. In addition, the project offered a rich learning environment,
+                        encompassing diverse areas such as volume rendering, game character animation, motion capture
+                        techniques, ray marching, and shader programming.
+                    </p>
                 </div>
-                
+
                 <div class="col-md-6">
                     <h2 class="text-center">Obstacles and Challenges</h2>
-                    <p class="text-center">obstacles - mediapipe is a pain</p>
+                    <p class="text-center">The project faced several technical and design challenges. The main hurdle
+                        early on was getting MediaPipe working within Unity, which complicated the integration of
+                        webcam-based gestures. The open-ended nature of the experience risked alienating users due to
+                        unclear interaction, which was a problem that further complicated the lack of recognisable
+                        gestures that we could track. Volume rendering in Unity was computationally intensive, requiring
+                        optimizations to balance performance and visual quality. Vertex displacement was a problem
+                        encountered during the last stretch of development, and time had to be spent optimising the
+                        effects to run on the GPU rather than CPU. Finally, achieving realistic environmental effects
+                        like smoke, weather, and day-night cycles posed challenges in maintaining aesthetic fidelity
+                        without exceeding computational limits.</p>
                 </div>
             </div>
         </div>
