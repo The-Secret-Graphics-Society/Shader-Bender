@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
-    <title>ShaderBender</title>
+    <title>Shader Bender</title>
 
     <meta property="og:title" content="Shader Bender">
     <meta property="og:description" content="Harness elemental powers with your webcam.">
@@ -37,13 +37,117 @@
                 </div>
                 <div class="col-md-6">
                     <h4>Water Element</h4>
-                    <p>Description 1</p>
+                    <p>The water element involves several components: vertex displacement, reflection/refraction,
+                        Fresnel effects and normals, dissolving, particle systems, and interaction with the environment.
+                        Vertex displacement uses 3D simplex noise for tiling on a sphere without artefacts, scaling the
+                        world position of the vertex to generate dynamic surface movement. Reflections and refractions,
+                        key to water realism [1], are approximated through distorted scene texture sampling, avoiding
+                        the computational cost of real-time ray tracing. Fresnel effects enhance rim lighting, another
+                        effect key to perceived realism of water, and normal mapping adds some extra surface texture. To
+                        get this working with the interaction, water is handled as a 3D object emitted by a particle
+                        system, where particles represent blobs of water and droplets. In order to enhance realism, we
+                        handle water dripping onto the floor as a render texture, where each hand's projected coordinate
+                        "paints" the render texture. This texture is used to calculate normals, modulate albedo, apply
+                        Fresnel effects, and dynamically change surface properties, including wetness and smoothness.
+                        Noise shapes the outlines of the puddles on the floor, with Gaussian blur and fading over time
+                        adding realism. This approach of approximating the effects of water in a porous surface (making
+                        it darker) and surface water puddles is inspired by Jensen et al [2]. An additional effect added
+                        are caustics, which are approximated by a Voronoi texture projected onto the scene.</p>
                 </div>
             </div>
 
             <div class="row align-items-center mb-5">
                 <div class="col-md-6 order-md-2">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 2">
+                    <img src="images/photos/development/lightning_dev.png" class="img-fluid" alt="Feature 2">
+                </div>
+                <div class="col-md-6 order-md-1">
+                    <h4>Lightning Element</h4>
+                    <p>The lightning element was created using a tessellation shader on the GPU in HLSL to generate
+                        detailed lightning-style meshes, with a Bezier curve function applied to simulate realistic arcs
+                        and splits. The technique used was based on a number of academic sources [3][4] as well as
+                        sources from the industry taking inspiration from Nvidia's own proposed technique [5]. However,
+                        several challenges arose during development. Transparency and alpha clipping were particularly
+                        problematic, as achieving smooth blending without visual artifacts required fine-tuning and
+                        often led to inconsistent results. Additionally, the tessellation approach introduced
+                        compatibility issues on GPUs with limited support, necessitating extra testing and
+                        optimizations. Unity's lack of native support for line tessellation further complicated the
+                        process, requiring the use of alternative techniques, such as approximating line geometry with
+                        quads, which added complexity and performance overhead. These issues highlighted limitations in
+                        both hardware and software that had to be carefully navigated throughout development.</p>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6">
+                    <img src="images/photos/development/meteor.webp" class="img-fluid" alt="Feature 3">
+                </div>
+                <div class="col-md-6">
+                    <h4>Fire Element</h4>
+                    <p>The fire element consists of three major interaction features, namely: Fire hands, flamethrower
+                        and meteor. Each of these features are triggered by the positional data of a users' hands.
+                        During the initial concept phase, I was looking into how volumetric fire could be implemented
+                        [6], due to performance issues, it was necessary to switch over to particle-based systems
+                        instead using custom shaders made in ShaderGraph. In order to create the fire hand and
+                        flamethrower effect, particle effects using texture sheets drawn in Photoshop were added, with
+                        procedural and simple noise being lerped together to create a layered noise effect, giving the
+                        effect of living flames as particles would inherit a random appearance [7]. Flame particles
+                        utilize hand positional data for the hands to track and follow the hands and to enable/disable
+                        the flames. For the flamethrower, this was in the end done by taking the average positional data
+                        and normalized rotation of the hands and emitting the flames with adjustments to the particle
+                        settings to enable collisional data to be received from ray casting to burnable objects. To
+                        handle burnable objects a stepwise burn texture to the object was added, then “dissolves” the
+                        texture by stepwise adjusting the albedo along the mesh to 0 depending on the amount of
+                        collisions to objects marked with the “Burnable” tag that use this custom burn shader. Finally I
+                        modelled a meteor in Blender, then added fire and smoke particle effects similarly to the above
+                        fire shader, then instantiated the object once a gesture has been met i.e. keep hand raised and
+                        then lower hand. This object is transformed from its start point towards a plane which replaces
+                        the meteor with a simple point of light explosion particle effect.</p>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6 order-md-2">
+                    <img src="images/photos/development/wind_look.webp" class="img-fluid" alt="Feature 4">
+                </div>
+                <div class="col-md-6 order-md-1">
+                    <h4>Wind Element</h4>
+                    <p>The wind effect was created as a procedural system combining volume rendering and dynamic
+                        parameter tweaking to align with the project's stylized aesthetic. During the prototyping phase,
+                        I explored various methods to represent the wind's movement visually. Leveraging ideas from
+                        procedural noise and ray marching techniques (as described by Scratchapixel [9]), I generated a
+                        volumetric effect using a noise function. By scaling vector components of the noise sample
+                        position, I enhanced the visual complexity and shape of the wind, giving it a more organic feel.
+                        I also exposed variables from the C# script, enabling other team members to synchronize the
+                        wind's state with environmental sounds and additional effects. This integration allowed the wind
+                        dome to move seamlessly with the player. Finally, I adjusted particle colors and densities to
+                        ensure the effect matched the surrounding environment while maintaining performance. Resources
+                        like the Real-Time Rendering [8] book, Scratchapixel's practical examples [9], and Guerrilla
+                        SIGGRAPH course [10] helped me design a wind dome effect that balances performance and visual
+                        quality, demonstrating the adaptability of volume rendering in gaming contexts.</p>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6">
+                    <img src="images/photos/development/fists.png" class="img-fluid" alt="Feature 5">
+                </div>
+                <div class="col-md-6">
+                    <h4>Motion Capture</h4>
+                    <p>The motion capture system was built using MediaPipe integrated into Unity via the <a
+                            href="https://github.com/homuler/MediaPipeUnityPlugin"> MediaPipe for Unity package</a>. We
+                        utilised the distance between tracked points to measure limb extension, which worked well for
+                        larger movements but had less precision for smaller limbs like fingers. This limitation
+                        influenced the game design, leading to a focus on full-body poses and easily recognizable
+                        landmarks, such as hands raised above the head. To accommodate player movement, including
+                        jumping and floor interactions, we implemented manual calibration to establish the player's
+                        position relative to the ground. This calibration process ensured a consistent experience but
+                        required additional effort to fine-tune for varying environments and player setups.</p>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6 order-md-2">
+                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 6">
                 </div>
                 <div class="col-md-6 order-md-1">
                     <h4>Environmental Effects and Soundscape</h4>
@@ -62,46 +166,6 @@
                         were utilized to create a night time environment. Lastly, the soundscape of the experience was
                         created utilizing sounds from FreeSound.org, that were then mixed together using the software
                         Audacity. </p>
-                </div>
-            </div>
-
-            <div class="row align-items-center mb-5">
-                <div class="col-md-6">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 3">
-                </div>
-                <div class="col-md-6">
-                    <h4>Feature 3</h4>
-                    <p>Description 3</p>
-                </div>
-            </div>
-
-            <div class="row align-items-center mb-5">
-                <div class="col-md-6 order-md-2">
-                    <img src="images/photos/development/cool_water.png" class="img-fluid" alt="Feature 4">
-                </div>
-                <div class="col-md-6 order-md-1">
-                    <h4>Motion Capture</h4>
-                    <p>Description 4</p>
-                </div>
-            </div>
-
-            <div class="row align-items-center mb-5">
-                <div class="col-md-6">
-                    <img src="images/photos/development/meteor.webp" class="img-fluid" alt="Feature 5">
-                </div>
-                <div class="col-md-6">
-                    <h4>Fire Element</h4>
-                    <p>Description 5</p>
-                </div>
-            </div>
-
-            <div class="row align-items-center mb-5">
-                <div class="col-md-6 order-md-2">
-                    <img src="images/photos/development/wind_look.webp" class="img-fluid" alt="Feature 6">
-                </div>
-                <div class="col-md-6 order-md-1">
-                    <h4>Wind Element</h4>
-                    <p>Description 6</p>
                 </div>
             </div>
         </div>
@@ -150,7 +214,40 @@
                         encountered during the last stretch of development, and time had to be spent optimising the
                         effects to run on the GPU rather than CPU. Finally, achieving realistic environmental effects
                         like smoke, weather, and day-night cycles posed challenges in maintaining aesthetic fidelity
-                        without exceeding computational limits.</p>
+                        without exceeding computational limits.
+                    </p>
+                    <h2 class="text-center">References</h2>
+                    <div class="centered-list">
+                        <ol>
+                            <li><a href="https://www.cg.tuwien.ac.at/courses/Seminar/WS2008/arbeit_fleck.pdf">Fleck,
+                                    Bernhard. “Real-Time Rendering of Water in Computer Graphics.” (2007).</a></li>
+                            <li><a
+                                    href="https://graphics.ucsd.edu/~henrik/papers/rendering_wet_materials/rendering_wet_materials_egwr99.pdf">Jensen,
+                                    Henrik W., et al. “Rendering of Wet Materials”. Rendering Techniques '99. Eds. D.
+                                    Lischinski and G. W. Larson. Springer-Verlag, pages 273-282, 1999.</a></li>
+                            <li><a href="https://dl.acm.org/doi/pdf/10.1145/192161.192256">T.R, and Brian Wyvill.
+                                    “Visual Simulation of Lightning.” PRISM (University of Calgary), 1 Jan. 1994.</a>
+                            </li>
+                            <li><a href="https://www.drilian.com/posts/2009.02.25-lightning-bolts/">Jersild, Josh.
+                                    “Lightning Bolts.” JoshJers' Ramblings, 2025.</a></li>
+                            <li><a
+                                    href="https://developer.download.nvidia.com/SDK/10/direct3d/Source/Lightning/doc/lightning_doc.pdf">Nvidia.
+                                    “Lightning SDK Demo Explained.” 2007.</a></li>
+                            <li><a href="https://doi.org/10.1145/1230100.1230131">Alfred R. Fuller, Hari Krishnan, Karim
+                                    Mahrous, Bernd Hamann, and Kenneth I. Joy. 2007. Real-time procedural volumetric
+                                    fire. Proceedings of symposium on Interactive 3D graphics and games (I3D '07).
+                                    Association for Computing Machinery, 175-180.</a></li>
+                            <li><a href="https://www.gdcvault.com/play/1017660/Technical-Artist-Bootcamp-The-VFX">Love,
+                                    J. 2013 Technical Artist Bootcamp: The VFX of Diablo</a></li>
+                            <li>T. Möller, E. Haines, and N. Hoffman, Real-time rendering, Fourth edition. Boca Raton:
+                                CRC Press, Taylor and Francis Group, 2018.</li>
+                            <li><a
+                                    href="https://www.scratchapixel.com/lessons/3d-basic-rendering/volume-rendering-for-developers/intro-volume-rendering.html">Scratchapixel,
+                                    "Volume Rendering." Accessed: Nov. 17, 2024.</a></li>
+                            <li>A. Schneider, “The Real-Time Volumetric Cloudscapes of Horizon Zero Dawn - Guerrilla
+                                Games,” in SIGGRAPH, 2015.</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>

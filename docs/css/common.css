@@ -29,18 +29,19 @@ body {
 
 .navbar a {
     filter: drop-shadow(-2px 3px 0px #000000);
+    text-transform: uppercase;
 }
 
 .navbar-nav a {
     color: #FFF;
-    text-transform: lowercase;
+    text-transform: uppercase;
     --bs-navbar-hover-color: rgba(199, 199, 199, 1);
     --bs-navbar-disabled-color: rgba(87, 87, 87);
 }
 
 .navbar-nav a.nav-link.active {
     color: rgba(199, 199, 199, 1);
-    text-transform: lowercase;
+    text-transform: uppercase;
     --bs-navbar-hover-color: rgba(199, 199, 199, 1);
     --bs-navbar-disabled-color: rgba(87, 87, 87);
 }
