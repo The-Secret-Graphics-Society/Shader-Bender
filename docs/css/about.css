@@ -18,13 +18,28 @@ h1.text-center {
     color: white;
     filter: drop-shadow(-1.5px 2px 0px #000000);
     font-weight: 700;
-    margin-bottom: 1.5rem;
 }
 
 .element-background {
     background: linear-gradient(135deg, #003366, #660000);
     color: white;
     padding: 4rem 0;
+}
+
+#video a {
+    font-size: large;
+    filter: drop-shadow(-1.5px 2px 0px #000000);
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #ff9933;
+    font-weight: 300;
+}
+
+.video-element {
+    max-width: 1000px;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
 }
 
 #about p.text-center {
