@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Shader Bender</title>
+
+    <meta property="og:title" content="Shader Bender">
+    <meta property="og:description" content="Harness elemental powers with your webcam.">
+    <meta property="og:image" content="https://the-secret-graphics-society.github.io/project2/images/og_image.png">
+    <meta property="og:url" content="https://the-secret-graphics-society.github.io/project2/">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" href="images/fire.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/repo.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/team.css">
+    <script src="js/gitapi.js"></script>
+    <script src="js/navbarandfooter.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+
+    <div class="big-area element-background">
+        <h1 class="text-center">Shader Bender</h1>
+
+        <section id="video" class="py-5 text-center">
+            <div class="container">
+                <video controls class="video-element">
+                    <source src="images/demoreel.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="video-undertext">
+                    <a href="https://freesound.org/people/AudioCoffee/sounds/721945/">Music by AudioCoffee</a>
+                </p>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2 class="text-center">About</h2>
+                <p class="text-center">
+                    Step into the immersive world of <span class="highlight">Shader Bender</span>, where your hands and
+                    arms become the ultimate tools of elemental mastery. In this sandbox experience, you will harness
+                    the raw power of the elements by controlling lightning, fire, water, and air through dynamic
+                    gestures and movements. Experiment, create, and bend the elements to your will. Whether you're
+                    crafting dazzling displays of elemental synergy or testing your skills on the dojo's poor potted
+                    plants, <span class="highlight">Shader Bender</span> offers a number of possibilities for creativity
+                    and discovery.
+                </p>
+            </div>
+        </section>
+
+        <section id="howtoplay">
+            <div class="container">
+                <h2 class="text-center">How to Play</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex flex-column">
+                            <img src="images/photos/calibration.jpg" class="img-fluid mb-3 img-howtoplay" alt="Setup Image">
+                            <div>
+                                <h5>Setup</h5>
+                                <p>To start your journey in <span class="highlight">Shader Bender</span>, simply
+                                    download and run the executable file. Once the game launches, press C to calibrate
+                                    your position. Ensure your entire body is visible to your computer's webcam, as
+                                    there's a 5-second timer for calibration. To ensure a consistent experience, get
+                                    into position by standing straight with your arms outstretched in a T-pose.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex">
+                            <div>
+                                <h5>Bending Elements</h5>
+                                <p><span class="highlight">Shader Bender</span> allows you to wield the powers of fire,
+                                    water, wind, and lightning. Each element has unique controls and mechanics, so
+                                    mastering them all will unlock your full potential.</p>
+                                <p><b>Water</b> - Activate by raising your left hand above your head, then lower it.</p>
+                                <p><b>Fire</b> - Activate by raising your right hand above your head, then lower it.
+                                    Call down meteors by raising and lowering your right hand, and extend your arms and
+                                    place your hands together to shoot flames from your hands.</p>
+                                <p><b>Wind</b> - Activate by raising and holding both of your hands above your head.</p>
+                                <p><b>Lightning</b> - Activate by when water or fire aren't active by extending your
+                                    arms forward and placing your hands together.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section id="team" class="py-5">
+        <div class="container">
+            <h2 class="text-center">The Team</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-1">
+                        <img src="images/team/filip_profile.jpg" alt="filip" class="team-member-img">
+                        <h5>Filip Karlsson</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">Lightning Effects</span>
+                            <span class="role-tag">Gesture Recognition</span>
+                            <span class="role-tag">Game Design</span>
+                        </div>
+                        <p>My primary focus on this project was developing the calibration system and adding to the
+                            gesture recognition system. The most visually striking feature I contributed was the
+                            lightning effect, inspired by a research paper on generating lightning-style textures using
+                            a tessellation shader on the GPU. By incorporating a Bezier curve function into the effect,
+                            the lightning effect was designed to arc and split dynamically with the environment,
+                            creating realistic and strikingly fast visuals. Through this project, I gained valuable
+                            experience in motion tracking, gesture recognition, and tessellation/geometry shaders,
+                            significantly improving my technical skills in these areas.
+                        </p>
+                        <div class="social-icons">
+                            <a href="https://www.linkedin.com/in/filip-karlsson-355685226/" target="_blank"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="https://canaguia.itch.io/" target="_blank"><img src="images/logos/itch.svg"
+                                    class="team-icon"></a>
+                            <a href="https://www.artstation.com/filipkarlsson" target="_blank"><img
+                                    src="images/logos/artstation.svg" class="team-icon"></a>
+                            <a href="https://github.com/Canaguia" target="_blank"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-2">
+                        <img src="images/team/martin_profile.jpeg" alt="martin" class="team-member-img">
+                        <h5>Martin Håkansson</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">3D Modeling</span>
+                            <span class="role-tag">Art</span>
+                            <span class="role-tag">Environmental Effects</span>
+                        </div>
+                        <p>My focus on this project was to model and texture the 3D models in the scene. All models such
+                            as the player character, the dojo, plants etc are made from scratch, so no external assets
+                            are used in the game. All models are made in blender, the textures are made in the blender
+                            shader node editor. Some of the assets are made using geometry nodes inside blender. The
+                            character is also rigged, and has is posed with inverse kinematics tracked from the user
+                            movement. As for environmental effects, I created the wind effects on the surrounding -
+                            which changes in intensity depending on the state of the wind dome. The wind is created with
+                            C# code, and has attributes passed into a vertex shader.</p>
+                        <div class="social-icons">
+                            <a href="https://www.linkedin.com/in/martin-h%C3%A5kansson-3329b0269/" target="_blank"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="mailto:marhaka@kth.se"><i class="bi bi-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-3">
+                        <img src="images/team/lucas_profile.jpg" alt="lucas" class="team-member-img">
+                        <h5>Lucas Åkesson</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">Environmental Effects</span>
+                            <span class="role-tag">Post Processing</span>
+                            <span class="role-tag">Audio</span>
+                        </div>
+                        <p>My contribution to Shader Bender involved working on the environmental setting of the
+                            experience. This involved creating weather effects such as rain, lightning and the clouds in
+                            the sky, getting the right look using post-processing, and enhancing the experience with an
+                            ambient soundscape. All weather effects were created using Unity's particle systems, and
+                            manipulating these to achieve the desired effect. The clouds are made using a Unity URP
+                            shader to achieve a fake volumetric-rendering effect. As such, the clouds are just a shader
+                            on a simple plane, with some added effects to make them feel more 3D. The post-processing
+                            was done using global volume, with effects such as bloom, vignette, and white balance. All
+                            of the sounds I included in the soundscape, such as rain and lightning, and the background
+                            track of the experience, were created using audio from FreeSound.</p>
+                        <div class="social-icons">
+                            <a href="mailto:malake@kth.se"><i class="bi bi-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-4">
+                        <img src="images/team/david_profile.png" alt="david" class="team-member-img">
+                        <h5>David Giraldo</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">Wind Effects</span>
+                            <span class="role-tag">Volume Rendering</span>
+                            <span class="role-tag">HLSL</span>
+                        </div>
+                        <p>In the Shader Bender project, I contributed by researching and implementing the wind-bending
+                            power using volume rendering techniques. I used HLSL to design a dynamic, visually
+                            compelling procedural effect for the wind dome and optimized its interaction with the player
+                            environment. I ensured seamless communication between the CPU and GPU for real-time updates.
+                            This work deepened my expertise in shader programming, procedural noise generation, and
+                            volume rendering techniques.</p>
+                        <div class="social-icons">
+                            <a href="https://how-to-find-me.netlify.app/" target="_blank"><i
+                                    class="bi bi-globe"></i></a>
+                            <a href="https://www.linkedin.com/in/davidgiraldodesign/" target="_blank"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="https://github.com/DavidGiraldoCode" target="_blank"><i
+                                    class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-5">
+                        <img src="images/team/william_profile.jpg" alt="william" class="team-member-img">
+                        <h5>William Rolf</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">Fire Effects</span>
+                            <span class="role-tag">Fire Interaction</span>
+                            <span class="role-tag">Audio</span>
+                        </div>
+                        <p>For my contribution to the Shader Bender project, I focused primarily on the fire element and
+                            object destruction part of the interaction. My research led me to finding resources for both
+                            volumetric and particle-based fire systems, the latter of which was demonstrated in a Q&A
+                            session with developers of the game “Diablo III” and showed that layered particle systems
+                            yield far better performance. Therefore I set about creating shaders that utilize layered
+                            particle systems for all kinds of fire interactions that I set up, from calling down meteors
+                            to casting a flamethrower and burning the environment around the player in real-time using
+                            motion tracking data. This project taught me how to handle complex interactions combined
+                            with particle system VFX techniques.</p>
+                        <div class="social-icons">
+                            <a href="https://www.linkedin.com/in/william-rolf-0b8514235/" target="_blank"><i
+                                    class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="team-member text-center" id="member-6">
+                        <img src="https://github.com/udon-udon.png" alt="udon">
+                        <h5>udon</h5>
+                        <div class="role-tags">
+                            <span class="role-tag">Water Effects</span>
+                            <span class="role-tag">Motion Capture</span>
+                            <span class="role-tag">Shaders</span>
+                            <span class="role-tag">Web Development</span>
+                        </div>
+                        <p>My contribution to the project was primarily with the motion capture and the water element. I
+                            led the effort to get MediaPipe working in Unity, and focused most of my initial efforts on
+                            getting the motion capture working properly so that other systems could be worked on in
+                            parallel. Once this was done, my advanced graphics contribution was implementing the water
+                            element, which was done in HLSL. The effect itself was handled through a particle system -
+                            which controlled emission of spheres with this shader, a render texture that I used as a
+                            "wetness map" to draw puddles of water on the ground, and projective volumes that emulated
+                            caustics. In addition, I moved the wind blowing effect from the CPU onto the GPU, handling
+                            vertex displacement in a shader. This project has deepened my knowledge of shader graphics
+                            and motion capture.</p>
+                        <div class="social-icons">
+                            <a href="https://github.com/udon-udon" target="_blank"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="repo" class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center">Github Repo</h2>
+        </div>
+
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-sm-12">
+                    <div class="repo-card" id="repo-card">
+                        <h3><a href="#" id="repo-name">Project2</a></h3>
+                        <div class="d-none d-md-block">
+                            <p id="repo-description">No description, website, or topics provided.</p>
+                        </div>
+                        <div class="social-icons">
+                            <a href="#" target="_blank" id="repo-icon"><i class="bi bi-github github-logo"></i></a>
+                        </div>
+                        <div class="repo-stats">
+                            <span id="repo-stars">⭐ Stars: <span id="repo-stars-num">0</span></span>
+                            <span id="repo-forks">🍴 Forks: <span id="repo-forks-num">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</body>
+
+</html>

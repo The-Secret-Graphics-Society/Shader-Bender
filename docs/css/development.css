@@ -1,0 +1,49 @@
+/* Development Section Styling */
+@counter-style repeating-emoji {
+    system: cyclic;
+    symbols: "\1F3AF";
+    suffix: " ";
+}
+
+.element-background {
+    background: linear-gradient(135deg, #1d3557, #457b9d, #a8dadc);
+    padding: 4rem 0;
+    color: #f1faee;
+}
+
+.text-highlight {
+    color: #FFFFFF !important;
+    font-weight: bold !important;
+}
+
+.col-md-6 img {
+    max-width: 600px;
+    width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.centered-list {
+    display: flex;
+    justify-content: center;
+}
+
+.centered-list ol,
+.centered-list ul {
+    text-align: left;
+    max-width: 600px;
+}
+
+.bullet-bullseye {
+    list-style-type: repeating-emoji;
+}
+
+@media (max-width: 768px) {
+    h4 {
+        margin-top: 10px !important;
+        text-align: center;
+    }
+}
