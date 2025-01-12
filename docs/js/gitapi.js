@@ -1,5 +1,5 @@
 const repoOwner = 'The-Secret-Graphics-Society';
-const repoName = 'Project2';
+const repoName = 'Shader-Bender';
 const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}`;
 
 fetch(apiUrl)
